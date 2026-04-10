@@ -12,6 +12,19 @@ module.exports = function (req, res, next) {
     // Verify token
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        
+        // Check if token is older than 7 days
+        const currentTime = Date.now() / 1000; // Current time in seconds
+        const tokenIssuedAt = decoded.iat; // Token issued time
+        const sevenDaysInSeconds = 7 * 24 * 60 * 60; // 7 days in seconds
+        
+        if (currentTime - tokenIssuedAt > sevenDaysInSeconds) {
+            return res.status(401).json({ 
+                msg: 'Session expired. Please login again.',
+                code: 'SESSION_EXPIRED'
+            });
+        }
+        
         req.user = decoded.user;
         next();
     } catch (err) {

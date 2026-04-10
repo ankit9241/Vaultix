@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Mail, Lock, ArrowRight } from "lucide-react";
-import { GoogleLogin } from '@react-oauth/google';
+import { GoogleLogin } from "@react-oauth/google";
 import authService from "../services/authService";
 import { useAuth } from "../context/AuthContext";
 
@@ -12,7 +12,13 @@ const Login = () => {
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, isAuthenticated, loading: authLoading } = useAuth();
+
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [authLoading, isAuthenticated, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,28 +40,28 @@ const Login = () => {
     try {
       setError("");
       setLoading(true);
-      
+
       // Send the Google ID token to your backend
-      const response = await fetch('/api/auth/google', {
-        method: 'POST',
+      const response = await fetch("/api/auth/google", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          token: credentialResponse.credential
+          token: credentialResponse.credential,
         }),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.msg || 'Google login failed');
+        throw new Error(errorData.msg || "Google login failed");
       }
-      
+
       const data = await response.json();
       await login(data.token);
       navigate("/dashboard");
     } catch (err) {
-      console.error('Google login error:', err);
+      console.error("Google login error:", err);
       setError(err.message || "Google login failed");
     } finally {
       setLoading(false);
@@ -64,7 +70,6 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden px-6">
-
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute w-[500px] h-[500px] bg-primary/10 blur-[120px] top-[-100px] left-[-100px]" />
         <div className="absolute w-[400px] h-[400px] bg-indigo-500/10 blur-[100px] bottom-[-100px] right-[-100px]" />
@@ -73,13 +78,11 @@ const Login = () => {
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-[size:40px_40px]" />
 
       <div className="relative z-10 w-full max-w-md">
-
         <div className="text-center mb-10">
-          <div className="w-12 h-12 mx-auto bg-primary rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-primary/30">
-            <span className="text-white font-bold">V</span>
-          </div>
-          <h1 className="text-3xl font-bold text-white">Vaultix</h1>
-          <p className="text-xs uppercase text-textMuted mt-1">Developer Vault</p>
+          <h1 className="text-3xl font-bold text-white">Envora</h1>
+          <p className="text-xs uppercase text-textMuted mt-1">
+            Developer Vault
+          </p>
         </div>
 
         <div className="bg-panel p-8 rounded-xl border border-border shadow-xl backdrop-blur-sm">
@@ -89,9 +92,11 @@ const Login = () => {
           {error && <div className="mb-4 text-sm text-red-400">{error}</div>}
 
           <form onSubmit={handleSubmit} className="space-y-5">
-
             <div className="relative">
-              <Mail size={18} className="absolute left-3 top-3 text-textMuted" />
+              <Mail
+                size={18}
+                className="absolute left-3 top-3 text-textMuted"
+              />
               <input
                 type="email"
                 required
@@ -103,7 +108,10 @@ const Login = () => {
             </div>
 
             <div className="relative">
-              <Lock size={18} className="absolute left-3 top-3 text-textMuted" />
+              <Lock
+                size={18}
+                className="absolute left-3 top-3 text-textMuted"
+              />
               <input
                 type="password"
                 required
@@ -142,10 +150,12 @@ const Login = () => {
                 <div className="w-full border-t border-border"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-panel text-textMuted">OR CONTINUE WITH</span>
+                <span className="px-2 bg-panel text-textMuted">
+                  OR CONTINUE WITH
+                </span>
               </div>
             </div>
-            
+
             <div className="mt-4">
               <GoogleLogin
                 onSuccess={handleGoogleLogin}
@@ -162,7 +172,6 @@ const Login = () => {
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );

@@ -7,4 +7,9 @@ const authMiddleware = require('../middleware/auth');
 router.post('/', authMiddleware, sectionController.createSection);
 router.get('/', authMiddleware, sectionController.getSections);
 
+// Standalone routes for individual sections
+router.get('/:id/children', authMiddleware, sectionController.getSectionChildren);
+router.put('/:id', authMiddleware, sectionController.updateSection);
+router.delete('/:id', authMiddleware, sectionController.deleteSection);
+
 module.exports = router;

@@ -6,6 +6,11 @@ const sectionSchema = new mongoose.Schema({
         ref: 'Project',
         required: true,
     },
+    parentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Section',
+        default: null,
+    },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -15,6 +20,11 @@ const sectionSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
+    },
+    type: {
+        type: String,
+        enum: ['folder', 'env'],
+        required: true,
     },
     createdAt: {
         type: Date,

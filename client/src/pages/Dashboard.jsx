@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Folder, Key, FileText } from "lucide-react";
-import { projectService, credentialService, noteService } from "../services/api";
+import {
+  projectService,
+  credentialService,
+  noteService,
+} from "../services/api";
 import { Link } from "react-router-dom";
 
 const Dashboard = () => {
@@ -9,11 +13,12 @@ const Dashboard = () => {
     { label: "Credentials", value: "0", icon: Key, link: "/credentials" },
     { label: "Notes", value: "0", icon: FileText, link: "/notes" },
   ]);
+  const [recentProjects, setRecentProjects] = useState([]);
 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetchDashboardData = async () => {
       try {
         const [projects, credentials, notes] = await Promise.all([
           projectService.getAll(),
@@ -21,10 +26,28 @@ const Dashboard = () => {
           noteService.getAll(),
         ]);
 
+        const projectList = projects.data || [];
+        setRecentProjects(projectList.slice(0, 5));
+
         setStats([
-          { label: "Projects", value: projects.data.length.toString(), icon: Folder, link: "/projects" },
-          { label: "Credentials", value: credentials.data.length.toString(), icon: Key, link: "/credentials" },
-          { label: "Notes", value: notes.data.length.toString(), icon: FileText, link: "/notes" },
+          {
+            label: "Projects",
+            value: projectList.length.toString(),
+            icon: Folder,
+            link: "/projects",
+          },
+          {
+            label: "Credentials",
+            value: (credentials.data || []).length.toString(),
+            icon: Key,
+            link: "/credentials",
+          },
+          {
+            label: "Notes",
+            value: (notes.data || []).length.toString(),
+            icon: FileText,
+            link: "/notes",
+          },
         ]);
       } catch (err) {
         console.error("Failed to fetch stats", err);
@@ -33,7 +56,7 @@ const Dashboard = () => {
       }
     };
 
-    fetchStats();
+    fetchDashboardData();
   }, []);
 
   return (
@@ -44,7 +67,7 @@ const Dashboard = () => {
           Architect Overview
         </h2>
         <p className="text-xs text-textMuted uppercase mt-1">
-          Last synchronized just now
+          Live project metrics
         </p>
       </div>
 
@@ -53,7 +76,6 @@ const Dashboard = () => {
         {stats.map((stat, i) => (
           <Link key={i} to={stat.link}>
             <div className="bg-card p-6 rounded-xl border border-border hover:border-primary/40 transition-all cursor-pointer relative overflow-hidden group">
-              
               {/* Icon Background */}
               <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20">
                 <stat.icon size={64} />
@@ -76,70 +98,33 @@ const Dashboard = () => {
         ))}
       </div>
 
-      {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* Activity */}
-        <div className="lg:col-span-2 space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-xl font-bold text-white">System Pulse</h3>
-            <button className="text-xs text-textMuted hover:text-white">
-              Clear Logs
-            </button>
-          </div>
+      {/* Recent Projects */}
+      <div className="space-y-4">
+        <h3 className="text-xl font-bold text-white">Recent Projects</h3>
 
-          {/* Static activity (can replace later) */}
-          <div className="space-y-3">
-            <div className="bg-panel p-4 rounded-xl flex justify-between">
-              <div>
-                <p className="text-sm text-white">
-                  Updated <span className="text-primary font-mono">.env</span>
-                </p>
-                <p className="text-xs text-textMuted">
-                  Variables synchronized
-                </p>
-              </div>
-              <span className="text-xs text-primary">Success</span>
-            </div>
-
-            <div className="bg-panel p-4 rounded-xl flex justify-between">
-              <div>
-                <p className="text-sm text-white">
-                  Added AWS Credentials
-                </p>
-                <p className="text-xs text-textMuted">
-                  Secure vault updated
-                </p>
-              </div>
-              <span className="text-xs text-yellow-400">Secured</span>
-            </div>
+        {loading ? (
+          <div className="text-textMuted text-sm">Loading projects...</div>
+        ) : recentProjects.length === 0 ? (
+          <div className="bg-panel p-6 rounded-xl text-textMuted text-sm">
+            No projects yet. Create your first project to get started.
           </div>
-        </div>
-
-        {/* Side Panel */}
-        <div className="space-y-6">
-          {/* CTA */}
-          <div className="bg-primary p-6 rounded-xl">
-            <h4 className="text-white font-bold text-lg mb-2">
-              Vault CLI Sync
-            </h4>
-            <p className="text-sm text-white/80 mb-4">
-              Sync secrets instantly from terminal
-            </p>
-            <button className="bg-white text-black px-4 py-2 rounded-lg text-sm font-semibold">
-              Install CLI
-            </button>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {recentProjects.map((project) => (
+              <Link key={project._id} to={`/projects/${project._id}`}>
+                <div className="bg-panel p-5 rounded-xl border border-border hover:border-primary/40 transition-all">
+                  <p className="text-white font-semibold">{project.name}</p>
+                  <p className="text-xs text-textMuted mt-1 line-clamp-2">
+                    {project.description || "No description"}
+                  </p>
+                  <div className="mt-3 text-xs text-textMuted">
+                    Created {new Date(project.createdAt).toLocaleDateString()}
+                  </div>
+                </div>
+              </Link>
+            ))}
           </div>
-
-          {/* Health */}
-          <div className="bg-card p-6 rounded-xl border border-border text-center">
-            <p className="text-sm text-white mb-4">Vault Health</p>
-            <div className="text-3xl font-bold text-primary">92</div>
-            <p className="text-xs text-textMuted mt-2">
-              Top 5% secure systems
-            </p>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* Floating Action Button */}

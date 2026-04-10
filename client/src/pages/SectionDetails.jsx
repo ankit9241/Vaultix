@@ -1,98 +1,129 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import {
-  ArrowLeft,
-  Plus,
-  Copy,
-  Trash2,
-  Check,
-  Eye,
-  EyeOff,
-  Folder,
-  FolderOpen,
-  Upload,
-  FileText,
-} from "lucide-react";
-import { envService, sectionService, projectService } from "../services/api";
-import { parseEnvContent } from "../utils/envUtils";
-import Card from "../components/ui/Card";
-import Button from "../components/ui/Button";
-import Modal from "../components/ui/Modal";
-import CodeBlock from "../components/ui/CodeBlock";
-import EnvTable from "../components/EnvTable";
-import FolderCard from "../components/FolderCard";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { ArrowLeft, FileText, Folder, Plus, Copy, Check } from "lucide-react";
+import { envService, projectService, sectionService } from "../services/api";
 import FolderBreadcrumb from "../components/FolderBreadcrumb";
+import FolderCard from "../components/FolderCard";
 import EnvModal from "../components/EnvModal";
+import EnvTable from "../components/EnvTable";
+import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
+import Modal from "../components/ui/Modal";
 
 const SectionDetails = () => {
   const { projectId, sectionId } = useParams();
   const navigate = useNavigate();
-  const [envs, setEnvs] = useState([]);
-  const [subfolders, setSubfolders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [section, setSection] = useState(null);
+
   const [project, setProject] = useState(null);
-  const [copiedId, setCopiedId] = useState(null);
+  const [section, setSection] = useState(null);
+  const [subfolders, setSubfolders] = useState([]);
+  const [envs, setEnvs] = useState([]);
+  const [hasFolders, setHasFolders] = useState(false);
+  const [hasEnv, setHasEnv] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
   const [isEnvModalOpen, setIsEnvModalOpen] = useState(false);
-  const [newFolder, setNewFolder] = useState({ name: "", description: "" });
+  const [newFolder, setNewFolder] = useState({ name: "" });
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
   const [copiedAll, setCopiedAll] = useState(false);
-  const [breadcrumb, setBreadcrumb] = useState([
-    { name: "Projects", path: `/projects` },
-    { name: "Loading...", path: `/projects/${projectId}` },
+  const [editingEnv, setEditingEnv] = useState(null);
+
+  const maskValue = (value = "") => "•".repeat(Math.min(value.length, 12));
+
+  const editEnv = (env) => {
+    setEditingEnv(env);
+    setIsEnvModalOpen(true);
+  };
+
+  const handleEnvUpdated = async (updatedEnv) => {
+    try {
+      await envService.update(editingEnv._id, updatedEnv);
+      setEditingEnv(null);
+      setIsEnvModalOpen(false);
+      await fetchData();
+      return true;
+    } catch (err) {
+      setError(err.response?.data?.msg || "Failed to update environment variable");
+      return false;
+    }
+  };
+
+  const breadcrumb = [
+    { name: "Projects", path: "/projects" },
+    { name: project?.name || "Loading...", path: `/projects/${projectId}` },
     {
-      name: "Loading...",
+      name: section?.name || "Loading...",
       path: `/projects/${projectId}/sections/${sectionId}`,
     },
-  ]);
-
-  // Update breadcrumb when data is loaded
-  useEffect(() => {
-    if (project?.name && section?.name) {
-      setBreadcrumb([
-        { name: "Projects", path: `/projects` },
-        { name: project.name, path: `/projects/${projectId}` },
-        {
-          name: section.name,
-          path: `/projects/${projectId}/sections/${sectionId}`,
-        },
-      ]);
-    }
-  }, [project, section, projectId, sectionId]);
+  ];
 
   useEffect(() => {
     fetchData();
-  }, [sectionId]);
+  }, [projectId, sectionId]);
 
   const fetchData = async () => {
+    setLoading(true);
+    setError("");
+
     try {
-      setLoading(true);
+      const [projectRes, sectionRes, allSectionsRes, envRes] =
+        await Promise.all([
+          projectService.getById(projectId),
+          sectionService.getById(sectionId),
+          sectionService.getAllByProject(projectId),
+          envService.getAllBySection(sectionId),
+        ]);
 
-      // Fetch project details
-      const projectRes = await projectService.getById(projectId);
       setProject(projectRes.data);
-
-      // Fetch section details
-      const sectionRes = await sectionService.getById(sectionId);
       setSection(sectionRes.data);
 
-      // Fetch environment variables
-      const envRes = await envService.getAllBySection(sectionId);
-      setEnvs(
-        envRes.data.map((e) => ({
-          ...e,
-          revealed: false,
-          actualValue: e.value || "",
-        })),
+      const childFolders = (allSectionsRes.data || []).filter(
+        (node) => node.parentId === sectionId && node.type === "folder",
+      );
+      const childFoldersWithCounts = await Promise.all(
+        childFolders.map(async (folder) => {
+          const folderCount = (allSectionsRes.data || []).filter(
+            (node) => node.parentId === folder._id && node.type === "folder",
+          ).length;
+
+          let envCount = 0;
+          try {
+            const folderEnvRes = await envService.getAllBySection(folder._id);
+            envCount = (folderEnvRes.data || []).length;
+          } catch {
+            envCount = folder.envCount ?? folder.varCount ?? 0;
+          }
+
+          return {
+            ...folder,
+            folderCount,
+            envCount,
+            varCount: envCount,
+          };
+        }),
       );
 
-      // TODO: Fetch subfolders when backend API is available
-      setSubfolders([]);
+      const childEnvs = (envRes.data || []).map((env) => ({
+        ...env,
+        revealed: false,
+        rawValue: env.value || "",
+        actualValue: env.value || "",
+        maskedValue: maskValue(env.value || ""),
+      }));
+
+      setSubfolders(childFoldersWithCounts);
+      setEnvs(childEnvs);
+      setHasFolders(childFoldersWithCounts.length > 0);
+      setHasEnv(childEnvs.length > 0);
     } catch (err) {
-      console.error("Failed to fetch data", err);
-      setError("Failed to load folder data");
+      console.error("Failed to fetch section details", err);
+      setError("Failed to load section data");
+      setSubfolders([]);
+      setEnvs([]);
+      setHasFolders(false);
+      setHasEnv(false);
     } finally {
       setLoading(false);
     }
@@ -102,12 +133,23 @@ const SectionDetails = () => {
     e.preventDefault();
     setSubmitting(true);
     setError("");
-    try {
-      // TODO: Implement folder creation API when backend is ready
-      // const folder = await folderService.create(projectId, sectionId, newFolder);
 
-      // For now, show a message that this feature is coming soon
-      setError("Folder creation will be available in the next update");
+    if (hasEnv) {
+      setError("Cannot create folder when env exists");
+      setSubmitting(false);
+      return;
+    }
+
+    try {
+      await sectionService.create(projectId, {
+        name: newFolder.name,
+        type: "folder",
+        parentId: sectionId,
+      });
+
+      setIsFolderModalOpen(false);
+      setNewFolder({ name: "" });
+      await fetchData();
     } catch (err) {
       setError(err.response?.data?.msg || "Failed to create folder");
     } finally {
@@ -116,96 +158,47 @@ const SectionDetails = () => {
   };
 
   const handleEnvCreated = async (newEnvs) => {
+    if (hasFolders) {
+      setError("Cannot add env when folders exist");
+      return false;
+    }
+
     try {
-      // Create each environment variable via API
-      const createdEnvs = [];
       for (const env of newEnvs) {
-        try {
-          const data = await envService.create(sectionId, {
-            key: env.key,
-            value: env.value,
-            description: env.description,
-          });
-
-          createdEnvs.push({
-            ...data.data,
-            revealed: false,
-            actualValue: env.value,
-          });
-        } catch (err) {
-          console.error(`Failed to create env ${env.key}:`, err);
-          // Continue with other envs even if one fails
-        }
+        await envService.create(sectionId, {
+          key: env.key,
+          value: env.value,
+          description: env.description,
+        });
       }
 
-      if (createdEnvs.length > 0) {
-        setEnvs([...envs, ...createdEnvs]);
-        return true;
-      } else {
-        setError("No environment variables were created");
-        return false;
-      }
+      await fetchData();
+      return true;
     } catch (err) {
-      setError("Failed to create environment variables");
+      setError(
+        err.response?.data?.msg || "Failed to create environment variable",
+      );
       return false;
     }
   };
 
-  const handleCopy = async (id, text) => {
-    await navigator.clipboard.writeText(text);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
-  };
-
-  const toggleReveal = (id) => {
-    setEnvs(
-      envs.map((env) =>
-        env._id === id ? { ...env, revealed: !env.revealed } : env,
-      ),
-    );
-  };
-
-  const handleDelete = async (id) => {
-    if (window.confirm("Delete this environment variable?")) {
-      try {
-        await envService.delete(id);
-        setEnvs(envs.filter((e) => e._id !== id));
-      } catch (err) {
-        console.error(err);
-        setError("Failed to delete environment variable");
-      }
-    }
-  };
-
-  const handleFolderNavigate = (folderId) => {
-    // TODO: Implement folder navigation when backend API is ready
-    setError("Folder navigation will be available in the next update");
-  };
-
-  const handleCopyAllEnv = () => {
+  const handleCopyAllEnv = async () => {
     const envContent = envs
-      .map((env) => `${env.key}=${env.actualValue || env.value}`)
+      .map(
+        (env) =>
+          `${env.key}=${env.actualValue ?? env.rawValue ?? env.value ?? ""}`,
+      )
       .join("\n");
 
-    navigator.clipboard
-      .writeText(envContent)
-      .then(() => {
-        setCopiedAll(true);
-        setTimeout(() => setCopiedAll(false), 2000); // Reset after 2 seconds
-      })
-      .catch((err) => {
-        console.error("Failed to copy environment variables:", err);
-      });
+    await navigator.clipboard.writeText(envContent);
+    setCopiedAll(true);
+    setTimeout(() => setCopiedAll(false), 1500);
   };
-
-  const maskValue = (value) => "•".repeat(Math.min(value.length, 12));
 
   return (
     <div className="space-y-6">
-      {/* Breadcrumb */}
       <FolderBreadcrumb breadcrumb={breadcrumb} />
 
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button
@@ -219,25 +212,56 @@ const SectionDetails = () => {
             <h1 className="text-3xl font-semibold text-primary">
               {section?.name || "Loading..."}
             </h1>
-            <p className="text-textSecondary mt-1">
+            <p className="text-text-secondary mt-1">
               Environment variables and subfolders
             </p>
           </div>
         </div>
+
         <div className="flex gap-2">
-          <Button onClick={() => setIsFolderModalOpen(true)}>
-            <Folder size={16} className="mr-2" />
-            Create Folder
-          </Button>
-          <Button onClick={() => setIsEnvModalOpen(true)}>
-            <Plus size={16} className="mr-2" />
-            Add ENV
-          </Button>
+          {hasFolders ? (
+            <Button onClick={() => setIsFolderModalOpen(true)}>
+              <Folder size={16} className="mr-2" />
+              Create Folder
+            </Button>
+          ) : hasEnv ? (
+            <Button onClick={() => setIsEnvModalOpen(true)}>
+              <Plus size={16} className="mr-2" />
+              Add ENV
+            </Button>
+          ) : (
+            <>
+              <Button onClick={() => setIsFolderModalOpen(true)}>
+                <Folder size={16} className="mr-2" />
+                Create Folder
+              </Button>
+              <Button onClick={() => setIsEnvModalOpen(true)}>
+                <Plus size={16} className="mr-2" />
+                Add ENV
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
-      {/* Subfolders */}
-      {subfolders.length > 0 && (
+      {error && (
+        <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm">
+          {error}
+        </div>
+      )}
+
+      {loading ? (
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="animate-pulse">
+              <div className="space-y-3">
+                <div className="h-4 bg-card rounded w-1/3"></div>
+                <div className="h-3 bg-card rounded w-2/3"></div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      ) : hasFolders ? (
         <div>
           <h2 className="text-lg font-semibold text-text-primary mb-4">
             Subfolders
@@ -247,20 +271,23 @@ const SectionDetails = () => {
               <FolderCard
                 key={folder._id}
                 folder={folder}
-                onNavigate={handleFolderNavigate}
+                onNavigate={(folderId) =>
+                  navigate(`/projects/${projectId}/sections/${folderId}`)
+                }
+                onEdit={() => {}}
+                onDelete={async (folderId) => {
+                  if (window.confirm("Delete this folder?")) {
+                    await sectionService.delete(folderId);
+                    await fetchData();
+                  }
+                }}
               />
             ))}
           </div>
         </div>
-      )}
-
-      {/* Environment Variables */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-text-primary">
-            Environment Variables
-          </h2>
-          {envs.length > 0 && (
+      ) : hasEnv ? (
+        <div className="space-y-4">
+          <div className="flex items-center justify-end">
             <Button
               variant="secondary"
               onClick={handleCopyAllEnv}
@@ -274,61 +301,64 @@ const SectionDetails = () => {
               ) : (
                 <>
                   <Copy size={16} />
-                  Copy All
+                  Copy .env
                 </>
               )}
             </Button>
-          )}
-        </div>
-        {loading ? (
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="animate-pulse">
-                <div className="space-y-3">
-                  <div className="h-4 bg-card rounded w-1/3"></div>
-                  <div className="h-3 bg-card rounded w-2/3"></div>
-                </div>
-              </Card>
-            ))}
           </div>
-        ) : envs.length === 0 ? (
-          <Card className="text-center py-12">
-            <div className="w-16 h-16 bg-card rounded-lg flex items-center justify-center text-text-muted mx-auto mb-4">
-              <FileText size={32} />
-            </div>
-            <h3 className="text-lg font-semibold text-primary mb-2">
-              No variables yet
-            </h3>
-            <p className="text-textSecondary mb-4">
-              Add your first environment variable to get started
-            </p>
-            <Button onClick={() => setIsEnvModalOpen(true)}>
-              <Plus size={16} className="mr-2" />
-              Add Variable
-            </Button>
-          </Card>
-        ) : (
+
           <EnvTable
             envs={envs}
-            onReveal={toggleReveal}
-            onCopy={handleCopy}
-            onDelete={handleDelete}
+            onReveal={(id) =>
+              setEnvs(
+                envs.map((env) =>
+                  env._id === id ? { ...env, revealed: !env.revealed } : env,
+                ),
+              )
+            }
+            onCopy={async (text) => navigator.clipboard.writeText(text)}
+            onDelete={async (id) => {
+              if (window.confirm("Delete this environment variable?")) {
+                await envService.delete(id);
+                await fetchData();
+              }
+            }}
+            onEdit={editEnv}
           />
-        )}
-      </div>
+        </div>
+      ) : (
+        <Card className="text-center py-12">
+          <div className="w-16 h-16 bg-card rounded-lg flex items-center justify-center text-text-muted mx-auto mb-4">
+            <FileText size={32} />
+          </div>
+          <h3 className="text-lg font-semibold text-primary mb-2">
+            No items yet
+          </h3>
+          <p className="text-text-secondary mb-4">
+            Create folders or add environment variables
+          </p>
+          <div className="flex justify-center gap-3">
+            <Button onClick={() => setIsFolderModalOpen(true)}>
+              <Folder size={16} className="mr-2" />
+              Create Folder
+            </Button>
+            <Button onClick={() => setIsEnvModalOpen(true)}>
+              <Plus size={16} className="mr-2" />
+              Add ENV
+            </Button>
+          </div>
+        </Card>
+      )}
 
-      {/* Create Folder Modal */}
       <Modal
         isOpen={isFolderModalOpen}
         title="Create Folder"
-        onClose={() => setIsFolderModalOpen(false)}
+        onClose={() => {
+          setIsFolderModalOpen(false);
+          setNewFolder({ name: "" });
+        }}
       >
         <form onSubmit={handleCreateFolder} className="space-y-4">
-          {error && (
-            <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm">
-              {error}
-            </div>
-          )}
           <div>
             <label className="block text-sm font-medium text-primary mb-2">
               Folder Name
@@ -337,26 +367,10 @@ const SectionDetails = () => {
               type="text"
               required
               value={newFolder.name}
-              onChange={(e) =>
-                setNewFolder({ ...newFolder, name: e.target.value })
-              }
-              placeholder="e.g. Development"
-              className="w-full bg-code text-text-primary border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent placeholder:text-text-muted"
+              onChange={(e) => setNewFolder({ name: e.target.value })}
+              placeholder="e.g. Backend"
+              className="w-full px-4 py-3 bg-code text-text-primary border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent placeholder:text-text-muted"
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-primary mb-2">
-              Description
-            </label>
-            <textarea
-              rows="3"
-              value={newFolder.description}
-              onChange={(e) =>
-                setNewFolder({ ...newFolder, description: e.target.value })
-              }
-              placeholder="What this folder contains..."
-              className="w-full bg-code text-text-primary border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent resize-none placeholder:text-text-muted"
-            ></textarea>
           </div>
           <div className="flex gap-3 pt-2">
             <Button
@@ -374,12 +388,16 @@ const SectionDetails = () => {
         </form>
       </Modal>
 
-      {/* Add Environment Variable Modal */}
       <EnvModal
         isOpen={isEnvModalOpen}
-        onClose={() => setIsEnvModalOpen(false)}
+        onClose={() => {
+          setIsEnvModalOpen(false);
+          setEditingEnv(null);
+        }}
         sectionId={sectionId}
         onEnvCreated={handleEnvCreated}
+        onEnvUpdated={handleEnvUpdated}
+        editingEnv={editingEnv}
       />
     </div>
   );
