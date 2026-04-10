@@ -1,5 +1,11 @@
 /api/*  https://envora.onrender.com/api/:splat  200
 /assets/*  /assets/:splat  200
+/projects/assets/*  /projects/assets/:splat  200
+/credentials/assets/*  /credentials/assets/:splat  200
+/notes/assets/*  /notes/assets/:splat  200
+/dashboard/assets/*  /dashboard/assets/:splat  200
+/login/assets/*  /login/assets/:splat  200
+/register/assets/*  /register/assets/:splat  200
 /*.js    /index.html   200
 /*.css   /index.html   200
 /*.svg   /index.html   200
