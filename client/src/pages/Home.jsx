@@ -110,7 +110,7 @@ const Home = () => {
             </div>
           </div>
           
-          <div className="relative group">
+          <div className="relative group hidden lg:flex">
             <div className="bg-[#11192c] border border-[#697596]/10 rounded-3xl overflow-hidden technical-glow">
               <div className="flex items-center gap-2 px-4 py-3 bg-[#151f36] border-b border-[#697596]/10">
                 <div className="w-3 h-3 rounded-full bg-[#bb5551]/40"></div>
