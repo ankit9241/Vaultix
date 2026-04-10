@@ -1,2 +1,14 @@
 /api/*  https://envora.onrender.com/api/:splat  200
+/assets/*  /assets/:splat  200
+/*.js    /index.html   200
+/*.css   /index.html   200
+/*.svg   /index.html   200
+/*.ico   /index.html   200
+/*.png   /index.html   200
+/*.jpg   /index.html   200
+/*.jpeg  /index.html   200
+/*.gif   /index.html   200
+/*.woff  /index.html   200
+/*.woff2 /index.html   200
+/*.ttf   /index.html   200
 /*    /index.html   200

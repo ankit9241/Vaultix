@@ -14,51 +14,51 @@ api.interceptors.request.use((config) => {
 });
 
 export const projectService = {
-  getAll: () => api.get("/projects"),
-  getById: (id) => api.get(`/projects/${id}`),
-  create: (data) => api.post("/projects", data),
-  update: (id, data) => api.put(`/projects/${id}`, data),
-  delete: (id) => api.delete(`/projects/${id}`),
+  getAll: () => api.get("/api/projects"),
+  getById: (id) => api.get(`/api/projects/${id}`),
+  create: (data) => api.post("/api/projects", data),
+  update: (id, data) => api.put(`/api/projects/${id}`, data),
+  delete: (id) => api.delete(`/api/projects/${id}`),
 };
 
 export const sectionService = {
-  getAllByProject: (projectId) => api.get(`/projects/${projectId}/sections`),
-  getById: (id) => api.get(`/sections/${id}`),
-  getChildren: (id) => api.get(`/sections/${id}/children`),
+  getAllByProject: (projectId) => api.get(`/api/projects/${projectId}/sections`),
+  getById: (id) => api.get(`/api/sections/${id}`),
+  getChildren: (id) => api.get(`/api/sections/${id}/children`),
   create: (projectId, data) =>
-    api.post(`/projects/${projectId}/sections`, data),
+    api.post(`/api/projects/${projectId}/sections`, data),
   createSection: (projectId, data) =>
-    api.post(`/projects/${projectId}/sections`, data),
-  update: (id, data) => api.put(`/sections/${id}`, data),
-  updateSection: (id, data) => api.put(`/sections/${id}`, data),
-  delete: (id) => api.delete(`/sections/${id}`),
-  deleteSection: (id) => api.delete(`/sections/${id}`),
+    api.post(`/api/projects/${projectId}/sections`, data),
+  update: (id, data) => api.put(`/api/sections/${id}`, data),
+  updateSection: (id, data) => api.put(`/api/sections/${id}`, data),
+  delete: (id) => api.delete(`/api/sections/${id}`),
+  deleteSection: (id) => api.delete(`/api/sections/${id}`),
 };
 
 export const envService = {
-  getAllBySection: (sectionId) => api.get(`/sections/${sectionId}/env`),
-  create: (sectionId, data) => api.post(`/sections/${sectionId}/env`, data),
-  getAllByProjectRoot: (projectId) => api.get(`/projects/${projectId}/env`),
+  getAllBySection: (sectionId) => api.get(`/api/sections/${sectionId}/env`),
+  create: (sectionId, data) => api.post(`/api/sections/${sectionId}/env`, data),
+  getAllByProjectRoot: (projectId) => api.get(`/api/projects/${projectId}/env`),
   createAtProjectRoot: (projectId, data) =>
-    api.post(`/projects/${projectId}/env`, data),
-  update: (id, data) => api.put(`/env/${id}`, data),
-  delete: (id) => api.delete(`/env/${id}`),
+    api.post(`/api/projects/${projectId}/env`, data),
+  update: (id, data) => api.put(`/api/env/${id}`, data),
+  delete: (id) => api.delete(`/api/env/${id}`),
 };
 
 export const credentialService = {
-  getAll: () => api.get("/credentials"),
-  getById: (id) => api.get(`/credentials/${id}`),
-  create: (data) => api.post("/credentials", data),
-  update: (id, data) => api.put(`/credentials/${id}`, data),
-  delete: (id) => api.delete(`/credentials/${id}`),
+  getAll: () => api.get("/api/credentials"),
+  getById: (id) => api.get(`/api/credentials/${id}`),
+  create: (data) => api.post("/api/credentials", data),
+  update: (id, data) => api.put(`/api/credentials/${id}`, data),
+  delete: (id) => api.delete(`/api/credentials/${id}`),
 };
 
 export const noteService = {
-  getAll: () => api.get("/notes"),
-  getById: (id) => api.get(`/notes/${id}`),
-  create: (data) => api.post("/notes", data),
-  update: (id, data) => api.put(`/notes/${id}`, data),
-  delete: (id) => api.delete(`/notes/${id}`),
+  getAll: () => api.get("/api/notes"),
+  getById: (id) => api.get(`/api/notes/${id}`),
+  create: (data) => api.post("/api/notes", data),
+  update: (id, data) => api.put(`/api/notes/${id}`, data),
+  delete: (id) => api.delete(`/api/notes/${id}`),
 };
 
 export default api;
