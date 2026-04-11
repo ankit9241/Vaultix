@@ -119,7 +119,7 @@ const EnvModal = ({ isOpen, onClose, sectionId, onEnvCreated, editingEnv }) => {
     >
       <div className="space-y-6">
         {error && (
-          <div className="p-3 bg-red-50 border border-red-100 text-red-600 rounded-lg text-sm">
+          <div className="rounded-lg border border-red-400/30 bg-red-500/10 p-3 text-sm text-red-300">
             {error}
           </div>
         )}
@@ -128,13 +128,13 @@ const EnvModal = ({ isOpen, onClose, sectionId, onEnvCreated, editingEnv }) => {
           {!showPreview ? (
             <>
               {/* Upload Method Selection */}
-              <div className="flex gap-2 p-1 bg-panel rounded-lg">
+              <div className="flex gap-2 rounded-lg bg-[#11151f] p-1">
                 <button
                   onClick={() => setUploadMethod("paste")}
                   className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all ${
                     uploadMethod === "paste"
-                      ? "bg-primary text-white shadow-sm"
-                      : "text-text-secondary hover:text-primary hover:bg-[#1E293B]"
+                      ? "bg-amber-400 text-[#0e0e10] shadow-sm"
+                      : "text-gray-300 hover:text-amber-300 hover:bg-[#1d2433]"
                   }`}
                 >
                   <FileText size={14} />
@@ -144,8 +144,8 @@ const EnvModal = ({ isOpen, onClose, sectionId, onEnvCreated, editingEnv }) => {
                   onClick={() => setUploadMethod("file")}
                   className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all ${
                     uploadMethod === "file"
-                      ? "bg-primary text-white shadow-sm"
-                      : "text-text-secondary hover:text-primary hover:bg-[#1E293B]"
+                      ? "bg-amber-400 text-[#0e0e10] shadow-sm"
+                      : "text-gray-300 hover:text-amber-300 hover:bg-[#1d2433]"
                   }`}
                 >
                   <Upload size={14} />
@@ -156,7 +156,7 @@ const EnvModal = ({ isOpen, onClose, sectionId, onEnvCreated, editingEnv }) => {
               {/* Paste Method */}
               {uploadMethod === "paste" && (
                 <div>
-                  <label className="block text-sm font-medium text-primary mb-2">
+                  <label className="mb-2 block text-sm font-medium text-amber-300">
                     Paste .env content
                   </label>
                   <textarea
@@ -164,9 +164,9 @@ const EnvModal = ({ isOpen, onClose, sectionId, onEnvCreated, editingEnv }) => {
                     value={envUploadText}
                     onChange={(e) => setEnvUploadText(e.target.value)}
                     placeholder="DATABASE_URL=postgresql://user:pass@localhost:5432/db&#10;JWT_SECRET=your-secret-key&#10;API_KEY=your-api-key&#10;NODE_ENV=production"
-                    className="w-full px-4 py-3 bg-code text-text-primary border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent font-mono text-sm placeholder:text-text-muted"
+                    className="w-full rounded-lg border border-gray-700 bg-[#1d2433] px-4 py-3 font-mono text-sm text-[#f4f4f5] placeholder:text-gray-500 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400"
                   />
-                  <p className="text-xs text-text-muted mt-2">
+                  <p className="mt-2 text-xs text-gray-400">
                     Paste your .env file content. Each line should be in
                     KEY=VALUE format.
                   </p>
@@ -176,18 +176,15 @@ const EnvModal = ({ isOpen, onClose, sectionId, onEnvCreated, editingEnv }) => {
               {/* File Upload Method */}
               {uploadMethod === "file" && (
                 <div>
-                  <label className="block text-sm font-medium text-primary mb-2">
+                  <label className="mb-2 block text-sm font-medium text-amber-300">
                     Upload .env file
                   </label>
-                  <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary/50 transition-colors">
-                    <Upload
-                      size={32}
-                      className="mx-auto text-text-muted mb-4"
-                    />
-                    <p className="text-sm text-text-primary mb-2">
+                  <div className="rounded-lg border-2 border-dashed border-gray-700 p-8 text-center transition-colors hover:border-amber-300/50">
+                    <Upload size={32} className="mx-auto mb-4 text-gray-500" />
+                    <p className="mb-2 text-sm text-[#f4f4f5]">
                       Click to upload or drag and drop
                     </p>
-                    <p className="text-xs text-text-muted mb-4">
+                    <p className="mb-4 text-xs text-gray-400">
                       Only .env files are supported
                     </p>
                     <input
@@ -200,18 +197,18 @@ const EnvModal = ({ isOpen, onClose, sectionId, onEnvCreated, editingEnv }) => {
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+                      className="rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-[#0e0e10] transition-colors hover:opacity-90"
                     >
                       Choose File
                     </button>
                   </div>
                   {envUploadText && (
                     <div className="mt-4">
-                      <p className="text-xs text-text-muted mb-2">
+                      <p className="mb-2 text-xs text-gray-400">
                         File content preview:
                       </p>
-                      <div className="bg-code p-3 rounded-lg max-h-32 overflow-y-auto">
-                        <pre className="text-xs text-text-muted font-mono">
+                      <div className="max-h-32 overflow-y-auto rounded-lg bg-[#1d2433] p-3">
+                        <pre className="font-mono text-xs text-gray-300">
                           {envUploadText.substring(0, 200)}
                           {envUploadText.length > 200 && "..."}
                         </pre>
@@ -243,32 +240,32 @@ const EnvModal = ({ isOpen, onClose, sectionId, onEnvCreated, editingEnv }) => {
           ) : (
             <>
               <div>
-                <h3 className="text-lg font-semibold text-primary mb-4">
+                <h3 className="mb-4 text-lg font-semibold text-amber-300">
                   Preview ({parsedEnvs.length} variables found)
                 </h3>
-                <div className="bg-transparent border border-border rounded-xl overflow-hidden">
-                  <table className="w-full text-left">
+                <div className="overflow-x-auto rounded-xl border border-[#3c3c3c] bg-[#1e1e1e]">
+                  <table className="w-full min-w-[640px] text-left">
                     <thead>
-                      <tr className="bg-transparent border-b border-border">
-                        <th className="px-4 py-3 text-xs font-bold text-text-secondary uppercase tracking-wider">
+                      <tr className="border-b border-[#3c3c3c] bg-[#2d2d30]">
+                        <th className="px-4 py-3 text-xs font-bold uppercase tracking-wider text-[#9da5b4]">
                           Key
                         </th>
-                        <th className="px-4 py-3 text-xs font-bold text-text-secondary uppercase tracking-wider">
+                        <th className="px-4 py-3 text-xs font-bold uppercase tracking-wider text-[#9da5b4]">
                           Value
                         </th>
-                        <th className="px-4 py-3 text-xs font-bold text-text-secondary uppercase tracking-wider text-right">
+                        <th className="px-4 py-3 text-right text-xs font-bold uppercase tracking-wider text-[#9da5b4]">
                           Actions
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-border">
+                    <tbody className="divide-y divide-[#3c3c3c]">
                       {parsedEnvs.map((env, index) => (
                         <tr
                           key={index}
-                          className="hover:bg-[#1E293B] transition-colors"
+                          className="transition-colors hover:bg-[#2a2d2e]"
                         >
                           <td className="px-4 py-3">
-                            <span className="font-mono text-sm font-semibold text-primary">
+                            <span className="font-mono text-sm font-semibold text-[#4FC1FF]">
                               {env.key}
                             </span>
                           </td>
@@ -281,7 +278,7 @@ const EnvModal = ({ isOpen, onClose, sectionId, onEnvCreated, editingEnv }) => {
                               </CodeBlock>
                               <button
                                 onClick={() => toggleValueReveal(index)}
-                                className="text-text-muted hover:text-primary transition-colors"
+                                className="text-gray-500 transition-colors hover:text-amber-300"
                               >
                                 {revealedValues[index] ? (
                                   <EyeOff size={14} />
@@ -298,7 +295,7 @@ const EnvModal = ({ isOpen, onClose, sectionId, onEnvCreated, editingEnv }) => {
                                   parsedEnvs.filter((_, i) => i !== index),
                                 );
                               }}
-                              className="text-text-muted hover:text-red-500 transition-colors"
+                              className="text-gray-500 transition-colors hover:text-red-400"
                             >
                               <X size={14} />
                             </button>

@@ -9,6 +9,7 @@ import EnvTable from "../components/EnvTable";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import Modal from "../components/ui/Modal";
+import Skeleton from "../components/ui/Skeleton";
 
 const SectionDetails = () => {
   const { projectId, sectionId } = useParams();
@@ -45,7 +46,9 @@ const SectionDetails = () => {
       await fetchData();
       return true;
     } catch (err) {
-      setError(err.response?.data?.msg || "Failed to update environment variable");
+      setError(
+        err.response?.data?.msg || "Failed to update environment variable",
+      );
       return false;
     }
   };
@@ -199,44 +202,62 @@ const SectionDetails = () => {
     <div className="space-y-6">
       <FolderBreadcrumb breadcrumb={breadcrumb} />
 
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <Button
             variant="ghost"
+            size="sm"
+            className="px-2 sm:px-3"
             onClick={() => navigate(`/projects/${projectId}`)}
           >
-            <ArrowLeft size={16} className="mr-2" />
+            <ArrowLeft size={14} className="mr-1.5" />
             Back
           </Button>
-          <div>
-            <h1 className="text-3xl font-semibold text-primary">
+          <div className="min-w-0">
+            <h1 className="text-3xl font-semibold text-amber-300">
               {section?.name || "Loading..."}
             </h1>
-            <p className="text-text-secondary mt-1">
+            <p className="mt-1 text-gray-300">
               Environment variables and subfolders
             </p>
           </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {hasFolders ? (
-            <Button onClick={() => setIsFolderModalOpen(true)}>
-              <Folder size={16} className="mr-2" />
+            <Button
+              size="sm"
+              className="text-xs sm:text-sm"
+              onClick={() => setIsFolderModalOpen(true)}
+            >
+              <Folder size={14} className="mr-1.5" />
               Create Folder
             </Button>
           ) : hasEnv ? (
-            <Button onClick={() => setIsEnvModalOpen(true)}>
-              <Plus size={16} className="mr-2" />
+            <Button
+              size="sm"
+              className="text-xs sm:text-sm"
+              onClick={() => setIsEnvModalOpen(true)}
+            >
+              <Plus size={14} className="mr-1.5" />
               Add ENV
             </Button>
           ) : (
             <>
-              <Button onClick={() => setIsFolderModalOpen(true)}>
-                <Folder size={16} className="mr-2" />
+              <Button
+                size="sm"
+                className="text-xs sm:text-sm"
+                onClick={() => setIsFolderModalOpen(true)}
+              >
+                <Folder size={14} className="mr-1.5" />
                 Create Folder
               </Button>
-              <Button onClick={() => setIsEnvModalOpen(true)}>
-                <Plus size={16} className="mr-2" />
+              <Button
+                size="sm"
+                className="text-xs sm:text-sm"
+                onClick={() => setIsEnvModalOpen(true)}
+              >
+                <Plus size={14} className="mr-1.5" />
                 Add ENV
               </Button>
             </>
@@ -245,7 +266,7 @@ const SectionDetails = () => {
       </div>
 
       {error && (
-        <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm">
+        <div className="rounded-lg border border-red-400/30 bg-red-500/10 p-3 text-sm text-red-300">
           {error}
         </div>
       )}
@@ -253,17 +274,17 @@ const SectionDetails = () => {
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <Card key={i} className="animate-pulse">
+            <Card key={i}>
               <div className="space-y-3">
-                <div className="h-4 bg-card rounded w-1/3"></div>
-                <div className="h-3 bg-card rounded w-2/3"></div>
+                <Skeleton className="h-4 w-1/3" />
+                <Skeleton className="h-3 w-2/3" />
               </div>
             </Card>
           ))}
         </div>
       ) : hasFolders ? (
         <div>
-          <h2 className="text-lg font-semibold text-text-primary mb-4">
+          <h2 className="mb-4 text-lg font-semibold text-[#f4f4f5]">
             Subfolders
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -327,14 +348,14 @@ const SectionDetails = () => {
           />
         </div>
       ) : (
-        <Card className="text-center py-12">
-          <div className="w-16 h-16 bg-card rounded-lg flex items-center justify-center text-text-muted mx-auto mb-4">
+        <Card className="py-12 text-center border-gray-700 bg-[#151a24]">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-lg bg-[#1d2433] text-gray-400">
             <FileText size={32} />
           </div>
-          <h3 className="text-lg font-semibold text-primary mb-2">
+          <h3 className="mb-2 text-lg font-semibold text-[#f4f4f5]">
             No items yet
           </h3>
-          <p className="text-text-secondary mb-4">
+          <p className="mb-4 text-gray-300">
             Create folders or add environment variables
           </p>
           <div className="flex justify-center gap-3">
@@ -360,7 +381,7 @@ const SectionDetails = () => {
       >
         <form onSubmit={handleCreateFolder} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-primary mb-2">
+            <label className="mb-2 block text-sm font-medium text-amber-300">
               Folder Name
             </label>
             <input
@@ -369,7 +390,7 @@ const SectionDetails = () => {
               value={newFolder.name}
               onChange={(e) => setNewFolder({ name: e.target.value })}
               placeholder="e.g. Backend"
-              className="w-full px-4 py-3 bg-code text-text-primary border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent placeholder:text-text-muted"
+              className="w-full rounded-lg border border-gray-700 bg-[#1d2433] px-4 py-3 text-[#f4f4f5] placeholder:text-gray-500 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400"
             />
           </div>
           <div className="flex gap-3 pt-2">

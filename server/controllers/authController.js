@@ -11,6 +11,17 @@ const Note = require("../models/Note");
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+// Helper function to generate JWT with 48-hour expiry
+const generateToken = (userId) => {
+  const payload = {
+    user: {
+      id: userId,
+    },
+  };
+  
+  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "48h" });
+};
+
 // @route   POST /api/auth/register
 // @desc    Register a user
 // @access  Public
@@ -34,21 +45,8 @@ exports.register = async (req, res) => {
 
     await user.save();
 
-    const payload = {
-      user: {
-        id: user.id,
-      },
-    };
-
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" },
-      (err, token) => {
-        if (err) throw err;
-        res.json({ token });
-      },
-    );
+    const token = generateToken(user.id);
+    res.json({ token });
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server error");
@@ -74,21 +72,8 @@ exports.login = async (req, res) => {
       return res.status(400).json({ msg: "Invalid Credentials" });
     }
 
-    const payload = {
-      user: {
-        id: user.id,
-      },
-    };
-
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" },
-      (err, token) => {
-        if (err) throw err;
-        res.json({ token });
-      },
-    );
+    const token = generateToken(user.id);
+    res.json({ token });
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server error");
@@ -137,20 +122,20 @@ exports.deleteUser = async (req, res) => {
 // @access  Public
 exports.googleAuth = async (req, res) => {
   try {
-    const { token } = req.body;
+    const { token: googleToken } = req.body;
 
     console.log(
       "Received Google auth request with token:",
-      token ? "present" : "missing",
+      googleToken ? "present" : "missing",
     );
 
-    if (!token) {
+    if (!googleToken) {
       return res.status(400).json({ msg: "No token provided" });
     }
 
     // Verify Google token
     const ticket = await client.verifyIdToken({
-      idToken: token,
+      idToken: googleToken,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
 
@@ -173,25 +158,12 @@ exports.googleAuth = async (req, res) => {
     }
 
     // Generate JWT
-    const payload = {
-      user: {
-        id: user._id,
-      },
-    };
-
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" },
-      (err, token) => {
-        if (err) throw err;
-        console.log("Generated JWT for Google user:", email);
-        res.json({
-          token,
-          user: { id: user._id, email, name, avatar: user.avatar },
-        });
-      },
-    );
+    const token = generateToken(user._id);
+    console.log("Generated JWT for Google user:", email);
+    res.json({
+      token,
+      user: { id: user._id, email, name, avatar: user.avatar },
+    });
   } catch (err) {
     console.error("Google auth error:", err.message);
     res

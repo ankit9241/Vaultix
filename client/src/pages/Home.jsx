@@ -1,396 +1,656 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  ArrowRight,
-  Shield,
-  FolderTree,
-  Database,
-  Key,
-  Upload,
-  ChevronRight,
-  Lock,
-  Plus,
-  Unlink,
-  History,
-  Folder,
-  Copy,
-  Download,
-  StickyNote,
-} from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-
-const problemPoints = [
-  "Delete a project -> your env is gone",
-  "Switch devices -> no access",
-  "You don't commit .env -> nowhere to store",
-  "Saved in notes or chats -> messy and unreliable",
-];
-
-const featureCards = [
-  {
-    icon: FolderTree,
-    title: "Project hierarchy",
-    description: "Deep nesting for multi-service architectures and monorepos.",
-  },
-  {
-    icon: Folder,
-    title: "Section-based storage",
-    description: "Logical grouping of variables by environment or microservice.",
-  },
-  {
-    icon: Key,
-    title: "Credentials manager",
-    description: "Dedicated fields for SSH keys, private keys, and certificates.",
-  },
-  {
-    icon: StickyNote,
-    title: "Developer notes",
-    description: "Contextual documentation attached directly to your variable blocks.",
-  },
-  {
-    icon: Download,
-    title: ".env import/export",
-    description: "Seamless migration from existing workflows with two-click exports.",
-  },
-  {
-    icon: Copy,
-    title: "Fast copy & reveal",
-    description: "Keyboard-centric UI for lightning-fast secret retrieval.",
-  },
-];
-
-const securityPoints = [
-  "Pre-storage encryption",
-  "Auth-Gated decryption",
-  "Zero Plaintext",
-  "Session-based access",
-];
-
-const howSteps = [
-  "Create project",
-  "Structure zones",
-  "Store variables",
-  "Access anytime",
-];
+import {
+  Lock,
+  GitBranch,
+  Users,
+  Check,
+  ChevronRight,
+  Shield,
+} from "lucide-react";
 
 const Home = () => {
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const { isAuthenticated, loading } = useAuth();
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    if (!loading && isAuthenticated) {
-      navigate("/dashboard", { replace: true });
+    if (isAuthenticated) {
+      navigate("/dashboard");
     }
-  }, [loading, isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const monoClass =
+    "[font-family:'JetBrains_Mono','Fira_Code',Consolas,Menlo,monospace]";
+  const containerClass =
+    "mx-auto w-full max-w-6xl px-6 max-[900px]:px-5 max-[620px]:px-4 max-[480px]:px-3";
+
+  const problemPoints = [
+    "You pushed a broken build because someone's .env file was outdated.",
+    "Onboarding a new dev took two hours of Slack pings for missing keys.",
+    "Your laptop died and you lost every local environment config.",
+    "Three projects, four staging environments, zero single source of truth.",
+    "You copy-pasted credentials into a Notion doc. You know that's wrong.",
+  ];
+
+  const features = [
+    {
+      icon: <Lock size={20} />,
+      title: "Secure storage",
+      desc: "Sensitive data is encrypted before storage and accessible only through your authenticated session.",
+    },
+    {
+      icon: <Users size={20} />,
+      title: "Access anywhere",
+      desc: "Access your env securely from any device through your dashboard.",
+    },
+    {
+      icon: <GitBranch size={20} />,
+      title: "Flexible updates",
+      desc: "Edit and update your environment variables anytime.",
+    },
+  ];
+
+  const security = [
+    { title: "Encrypted before storage", desc: "" },
+    { title: "No plaintext values in database", desc: "" },
+    { title: "Access restricted to your account", desc: "" },
+  ];
 
   return (
-    <div className="relative min-h-screen bg-white text-gray-800 antialiased">
-      {/* TopNavBar */}
-      <nav className="fixed top-0 w-full z-50 bg-white border-b border-gray-200 flex justify-between items-center px-8 py-4 max-w-full font-['Inter'] antialiased tracking-tight">
-        <div className="text-xl font-bold tracking-tighter text-gray-800">Envora</div>
-        <div className="flex items-center space-x-4">
-          <Link to="/login" className="text-gray-600 hover:text-gray-900 transition-colors duration-200 scale-95 active:opacity-80">Sign In</Link>
-          <Link to="/register" className="bg-blue-600 text-white px-4 py-1.5 rounded-3xl font-medium scale-95 active:opacity-80 transition-transform hover:bg-blue-700">Get Started</Link>
+    <div className="min-h-screen overflow-x-hidden bg-[#0e0e10] text-[#f4f4f5]">
+      <header
+        className={`fixed left-0 right-0 top-0 z-50 border-b border-transparent bg-transparent transition-all duration-[250ms] ${
+          scrolled ? "border-gray-800 bg-[#0e0e10]/93 backdrop-blur-md" : ""
+        }`}
+      >
+        <div
+          className={`${containerClass} flex h-14 items-center justify-between`}
+        >
+          <div className="flex items-center gap-2 text-sm font-semibold tracking-tight">
+            <div
+              className="grid h-6 w-6 place-items-center rounded-md bg-amber-400"
+              aria-hidden="true"
+            >
+              <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
+                <path
+                  d="M4 7h16M4 12h10M4 17h6"
+                  stroke="#0E0E10"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </div>
+            <span>Envora</span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Link
+              to="/login"
+              className="bg-transparent px-3 py-1.5 text-sm text-gray-400 transition-all duration-[180ms] hover:text-gray-100 hover:opacity-100 max-[620px]:hidden"
+            >
+              Login
+            </Link>
+            <Link
+              to="/register"
+              className="inline-flex items-center justify-center rounded-lg bg-amber-400 px-4 py-2 text-sm font-semibold text-[#0e0e10] transition-all duration-[180ms] hover:opacity-90"
+            >
+              Get Started
+            </Link>
+          </div>
         </div>
-      </nav>
-      
-      <main className="pt-24">
-        {/* Hero Section */}
-        <section className="w-full px-8 pt-20 pb-32 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center bg-gray-50">
-          <div className="space-y-8">
-            <h1 className="text-5xl md:text-6xl font-bold tracking-tighter text-gray-800 leading-[1.1]">
-              One place for your .env, secrets, and project structure
-            </h1>
-            <p className="text-gray-700 leading-relaxed">
-              Envora is a structured developer vault to manage environment variables, credentials, notes, and project sections without losing track.
+      </header>
+
+      <main>
+        <section className="pb-20 pt-32">
+          <div
+            className={`${containerClass} grid items-center gap-16 overflow-x-hidden lg:grid-cols-2`}
+          >
+            <div className="translate-y-0 opacity-100">
+              <h1 className="mb-5 text-5xl font-bold leading-[1.08] tracking-[-0.02em] lg:text-6xl">
+                Your env vars.
+                <br />
+                <span className="bg-gradient-to-r from-amber-300 to-yellow-300 bg-clip-text text-transparent">
+                  Always there.
+                </span>
+              </h1>
+
+              <p className="mb-7 max-w-[520px] text-base text-gray-400">
+                Envora secures, syncs, and manages your environment variables
+                across every device, project, and team - so you never lose a
+                config file again.
+              </p>
+
+              <div className="flex flex-wrap items-center gap-3 max-[620px]:w-full max-[620px]:flex-col">
+                <Link
+                  to="/register"
+                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-amber-400 px-5 py-2.5 text-sm font-semibold text-[#0e0e10] transition-all duration-[180ms] hover:opacity-90 max-[620px]:w-full"
+                >
+                  Start for free <ChevronRight size={16} />
+                </Link>
+              </div>
+            </div>
+
+            <div className="relative translate-y-0 opacity-100">
+              <div
+                className="pointer-events-none absolute inset-0 scale-[0.88] rounded-[18px] bg-amber-400/5 blur-[72px]"
+                aria-hidden="true"
+              ></div>
+              <div className="relative max-w-full overflow-hidden rounded-[10px] border border-gray-800 bg-gradient-to-br from-[#0f1115] via-[#11141a] to-[#0d1015] max-[620px]:overflow-x-auto">
+                <div className="flex items-center gap-2 border-b border-gray-800 px-4 py-3">
+                  <span className="h-3 w-3 rounded-full bg-red-500 opacity-80"></span>
+                  <span className="h-3 w-3 rounded-full bg-yellow-400 opacity-80"></span>
+                  <span className="h-3 w-3 rounded-full bg-green-500 opacity-80"></span>
+                  <span className={`${monoClass} ml-2 text-xs text-gray-500`}>
+                    ~/myproject/.env
+                  </span>
+                </div>
+
+                <div
+                  className={`${monoClass} break-all p-5 text-sm leading-[1.65] text-gray-300 max-[900px]:p-4 max-[900px]:text-xs max-[620px]:overflow-x-auto max-[620px]:p-2 max-[620px]:text-[10px] max-[480px]:p-1.5 max-[480px]:text-[9px]`}
+                >
+                  <div className="text-gray-600">
+                    # synced by envora * 2 secs ago
+                  </div>
+
+                  <div className="mt-3">
+                    <span className="text-gray-400">DATABASE_URL</span>{" "}
+                    <span className="text-gray-600">=</span>
+                    <span className="text-amber-400">
+                      enc::v1::aGVsbG8gd29ybGQ=
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-400">STRIPE_SECRET_KEY</span>
+                    <span className="text-gray-600">=</span>
+                    <span className="text-amber-400">
+                      enc::v1::c2VjcmV0a2V5aGVyZQ=
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-400">NEXT_PUBLIC_API_URL</span>
+                    <span className="text-gray-600">=</span>{" "}
+                    <span>https://api.myapp.com</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-400">OPENAI_API_KEY</span>
+                    <span className="text-gray-600">=</span>
+                    <span className="text-amber-400">
+                      enc::v1::b3BlbmFpa2V5aGVyZQ=
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-400">JWT_SECRET</span>{" "}
+                    <span className="text-gray-600">=</span>
+                    <span className="text-amber-400">
+                      enc::v1::and0c2VjcmV0aGVyZQ=
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-400">REDIS_URL</span>
+                    <span className="text-gray-600">=</span>
+                    <span className="text-amber-400">
+                      enc::v1::cmVkaXN1cmxoZXJl
+                    </span>
+                  </div>
+
+                  <div className="mt-3 flex items-center gap-2">
+                    <Check size={14} className="text-amber-300" />
+                    <span className="text-gray-600">
+                      6 variables synced across 3 devices
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="overflow-x-hidden py-16">
+          <div className="h-px w-full bg-gray-800"></div>
+          <div className={`${containerClass} max-w-3xl pt-16`}>
+            <p
+              className={`${monoClass} mb-4 text-xs uppercase tracking-[0.15em] text-amber-400`}
+            >
+              The problem
             </p>
-            <div className="flex items-center gap-4">
-              <Link to="/register" className="bg-blue-600 text-white px-8 py-3 rounded-3xl font-semibold hover:bg-blue-700 transition-colors">Get Started</Link>
-              <Link to="/login" className="border border-gray-300 px-8 py-3 rounded-3xl font-semibold text-gray-700 hover:bg-gray-50 transition-colors">Login</Link>
-            </div>
-          </div>
-          
-          <div className="relative group hidden lg:flex">
-            <div className="bg-[#11192c] border border-[#697596]/10 rounded-3xl overflow-hidden technical-glow">
-              <div className="flex items-center gap-2 px-4 py-3 bg-[#151f36] border-b border-[#697596]/10">
-                <div className="w-3 h-3 rounded-full bg-[#bb5551]/40"></div>
-                <div className="w-3 h-3 rounded-full bg-[#8f9fb7]/40"></div>
-                <div className="w-3 h-3 rounded-full bg-[#c5c7c8]/40"></div>
-                <div className="ml-4 text-[0.6875rem] uppercase tracking-widest text-[#8f9fb7]">System-Terminal-v2.0</div>
-              </div>
-              <div className="flex h-[400px]">
-                {/* Sidebar Mock */}
-                <div className="w-48 bg-gray-900 border-r border-gray-300 p-4 space-y-4">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-gray-300 font-bold text-sm">
-                      <FolderTree className="w-4 h-4" />
-                      <span className="ml-2">Amazon</span>
-                    </div>
-                    <div className="pl-6 space-y-1">
-                      <div className="flex items-center gap-2 text-white text-sm hover:text-gray-900 cursor-pointer">
-                        <Folder className="w-4 h-4" />
-                        <span className="ml-2">frontend</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-white text-sm py-1 rounded cursor-pointer">
-                        <Folder className="w-4 h-4" />
-                        <span className="ml-2">backend</span>
-                      </div>
-                    </div>
-                  </div>
+            <h2 className="mb-3.5 text-[clamp(30px,4vw,42px)] leading-[1.12] tracking-[-0.02em]">
+              Config management is broken.
+            </h2>
+            <p className="text-sm text-gray-400">
+              Most teams treat environment variables as an afterthought - until
+              something goes wrong.
+            </p>
+
+            <div className="mt-7">
+              {problemPoints.map((point, index) => (
+                <div
+                  key={index}
+                  className="flex items-start gap-4 border-b border-gray-800 py-[18px] last:border-b-0 max-[620px]:py-2.5 max-[480px]:py-2"
+                >
+                  <span
+                    className={`${monoClass} w-[22px] shrink-0 text-xs text-gray-600`}
+                  >
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <p className="text-sm text-gray-300">{point}</p>
                 </div>
-                
-                {/* Content Mock */}
-                <div className="flex-1 p-6 space-y-6">
-                  <div className="flex justify-between items-end border-b border-gray-200 pb-4">
-                    <div>
-                      <div className="text-[0.6875rem] uppercase tracking-widest text-white mb-1">Current Directory</div>
-                      <div className="text-white font-mono text-sm">Project / backend</div>
-                    </div>
-                    <Plus className="text-gray-500 text-lg" />
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <div className="grid grid-cols-2 gap-4 text-[0.6875rem] uppercase tracking-widest text-white">
-                      <span>Key</span>
-                      <span>Value</span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4 items-center group/row">
-                      <div className="font-mono text-sm text-white">DATABASE_URL</div>
-                      <div className="bg-gray-100 px-2 py-1 font-mono text-sm text-gray-600 truncate">postgres://admin:••••••@db...</div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4 items-center group/row">
-                      <div className="font-mono text-sm text-white">STRIPE_SK</div>
-                      <div className="bg-gray-100 px-2 py-1 font-mono text-sm text-gray-600 truncate">sk_live_51M... <Copy className="float-right text-xs" /></div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4 items-center group/row opacity-50">
-                      <div className="font-mono text-sm text-white">NODE_ENV</div>
-                      <div className="bg-gray-100 px-2 py-1 font-mono text-sm text-gray-600">production</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
-            
-            {/* Abstract UI elements */}
-            <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-blue-500/10 blur-3xl -z-10"></div>
           </div>
         </section>
 
-        {/* Problem Section */}
-        <section className="bg-gray-50 py-32 border-y border-gray-200">
-          <div className="w-full px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
+        <section className="overflow-x-hidden py-16">
+          <div className="h-px w-full bg-gray-800"></div>
+          <div
+            className={`${containerClass} grid grid-cols-1 items-start gap-8 pt-16 lg:grid-cols-2 lg:gap-16 max-[620px]:gap-5`}
+          >
+            <div>
+              <p
+                className={`${monoClass} mb-4 text-xs uppercase tracking-[0.15em] text-amber-400`}
+              >
+                The solution
+              </p>
+              <h2 className="mb-3.5 text-[clamp(30px,4vw,42px)] leading-[1.12] tracking-[-0.02em]">
+                One vault.
+                <br />
+                Every project.
+                <br />
+                Every device.
+              </h2>
+              <p className="max-w-[420px] text-sm text-gray-400">
+                Envora gives each project a secure vault for environment
+                variables. Pull the right config anywhere - laptop, CI,
+                production - from your dashboard.
+              </p>
+
+              <div className="mt-[18px] grid gap-3">
+                <div className="flex items-center gap-2.5 text-sm text-gray-300">
+                  <Check size={16} className="text-amber-300" />
+                  End-to-end encryption, always
+                </div>
+                <div className="flex items-center gap-2.5 text-sm text-gray-300">
+                  <Check size={16} className="text-amber-300" />
+                  Hierarchical project structure
+                </div>
+                <div className="flex items-center gap-2.5 text-sm text-gray-300">
+                  <Check size={16} className="text-amber-300" />
+                  Per-environment overrides
+                </div>
+                <div className="flex items-center gap-2.5 text-sm text-gray-300">
+                  <Check size={16} className="text-amber-300" />
+                  Access and manage your environment variables directly from
+                  your dashboard
+                </div>
+              </div>
+            </div>
+
+            <div className="relative max-w-full overflow-hidden rounded-[10px] border border-gray-800 bg-[#18181b] max-[620px]:overflow-x-auto">
+              <div className="flex items-center gap-2 border-b border-gray-800 px-4 py-3">
+                <span className="h-3 w-3 rounded-full bg-red-500 opacity-80"></span>
+                <span className="h-3 w-3 rounded-full bg-yellow-400 opacity-80"></span>
+                <span className="h-3 w-3 rounded-full bg-green-500 opacity-80"></span>
+                <span className={`${monoClass} ml-2 text-xs text-gray-500`}>
+                  project structure
+                </span>
+              </div>
+
+              <div
+                className={`${monoClass} break-all p-5 text-[13px] leading-[1.65] text-gray-300 max-[900px]:p-4 max-[900px]:text-xs max-[620px]:overflow-x-auto max-[620px]:p-2 max-[620px]:text-[10px] max-[480px]:p-1.5 max-[480px]:text-[9px]`}
+              >
+                <div>my-saas</div>
+                <div className="text-gray-600">
+                  |-- <span className="text-gray-300">frontend</span>
+                </div>
+                <div className="text-gray-600">
+                  | |-- <span className="text-amber-400">.env.development</span>
+                </div>
+                <div className="text-gray-600">
+                  | |-- <span className="text-amber-400">.env.staging</span>
+                </div>
+                <div className="text-gray-600">
+                  | `-- <span className="text-amber-400">.env.production</span>
+                </div>
+                <div className="text-gray-600">
+                  |-- <span className="text-gray-300">backend</span>
+                </div>
+                <div className="text-gray-600">
+                  | |-- <span className="text-amber-400">.env.development</span>
+                </div>
+                <div className="text-gray-600">
+                  | |-- <span className="text-amber-400">.env.staging</span>
+                </div>
+                <div className="text-gray-600">
+                  | `-- <span className="text-amber-400">.env.production</span>
+                </div>
+                <div className="text-gray-600">
+                  `-- <span className="text-gray-300">shared</span>
+                </div>
+                <div className="text-gray-600">
+                  `-- <span className="text-amber-400">.env.base</span>
+                </div>
+
+                <div className="mt-4 border-t border-gray-800 pt-4">
+                  <div>
+                    <span className="text-gray-600">#</span> Dashboard action:{" "}
+                    <span className="text-amber-400">
+                      Open frontend/production
+                    </span>
+                  </div>
+                  <div className="mt-1.5 flex items-center gap-2">
+                    <Check size={14} className="text-amber-300" />
+                    <span className="text-gray-600">
+                      12 variables available in this environment
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className={containerClass}>
+            <div className="mt-[38px] flex items-start gap-3 rounded-[10px] border border-amber-400/20 bg-amber-400/5 p-[18px_22px]">
+              <Shield size={20} className="shrink-0 text-amber-300" />
               <div>
-                <h2 className="text-3xl font-bold tracking-tighter text-gray-800 mb-6">Developers lose track of env and secrets</h2>
-                <p className="text-gray-700 leading-relaxed">The modern stack is fragmented. Secrets shouldn't be.</p>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-3">
-                  <Unlink className="text-red-500 text-2xl" />
-                  <h3 className="font-bold text-gray-800">Scattered .env files</h3>
-                  <p className="text-sm text-gray-600">Variables hidden across local machines, servers, and CI/CD pipelines.</p>
+                <div className="mb-1.5 text-sm font-semibold text-gray-100">
+                  The zero-knowledge rule
                 </div>
-                <div className="space-y-3">
-                  <History className="text-orange-500 text-2xl" />
-                  <h3 className="font-bold text-gray-800">No Structure</h3>
-                  <p className="text-sm text-gray-600">Credentials saved in random notes or Slack messages. Hard to manage separation.</p>
-                </div>
+                <p className="text-sm text-gray-400">
+                  Envora never stores plaintext secrets. Every value is
+                  encrypted on your device before it leaves. Our servers hold
+                  only ciphertext. Your data is encrypted before storage and
+                  only accessible through your authenticated session.
+                </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Features Section */}
-        <section className="bg-gradient-to-br from-gray-50 to-white py-16">
-          <div className="w-full px-8">
-            <div className="text-center mb-20 space-y-4">
-              <h2 className="text-5xl font-bold tracking-tighter text-gray-900 mb-4">Built for how developers actually work</h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                Envora isn't just storage - it's a structured system to manage environment variables, credentials, and project data without losing anything.
+        <section className="overflow-x-hidden py-16">
+          <div className="h-px w-full bg-gray-800"></div>
+          <div className={`${containerClass} pt-16`}>
+            <p
+              className={`${monoClass} mb-4 text-xs uppercase tracking-[0.15em] text-amber-400`}
+            >
+              Features
+            </p>
+            <h2 className="mb-3.5 text-[clamp(30px,4vw,42px)] leading-[1.12] tracking-[-0.02em]">
+              Everything you need.
+            </h2>
+            <p className="text-sm text-gray-400">Nothing you don't.</p>
+
+            <div className="mt-[34px] grid grid-cols-1 gap-4 overflow-x-hidden md:grid-cols-2 xl:grid-cols-3">
+              {features.map((feature, index) => (
+                <article
+                  key={index}
+                  className="rounded-[10px] border border-gray-800 bg-[#18181b] p-4 transition duration-[180ms] hover:border-amber-400/40 max-[620px]:p-3"
+                >
+                  <div className="mb-3.5 text-base font-bold text-amber-400">
+                    {feature.icon}
+                  </div>
+                  <h3 className="mb-2 text-sm text-gray-100">
+                    {feature.title}
+                  </h3>
+                  <p className="text-xs leading-[1.6] text-gray-500">
+                    {feature.desc}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="overflow-x-hidden py-16">
+          <div className="h-px w-full bg-gray-800"></div>
+          <div className={`${containerClass} max-w-[900px] pt-16`}>
+            <p
+              className={`${monoClass} mb-4 text-xs uppercase tracking-[0.15em] text-amber-400`}
+            >
+              Workflow
+            </p>
+            <h2 className="mb-3.5 text-[clamp(30px,4vw,42px)] leading-[1.12] tracking-[-0.02em]">
+              Up in four steps.
+            </h2>
+
+            <div className="hidden items-start md:flex">
+              {[
+                {
+                  step: "01",
+                  title: "Login with Google",
+                  command: "Click 'Get Started' → Google Login",
+                },
+                {
+                  step: "02",
+                  title: "Create project",
+                  command: "Projects → New Project",
+                },
+                {
+                  step: "03",
+                  title: "Add sections",
+                  command: "Project → Create Folders/Envs",
+                },
+                {
+                  step: "04",
+                  title: "Add variables",
+                  command: "Section → Add Environment Variables",
+                },
+              ].map((item, index) => (
+                <div key={index} className="min-w-0 flex-1">
+                  <div className="flex w-full items-center">
+                    <div
+                      className={`${monoClass} grid h-8 w-8 shrink-0 place-items-center rounded-full border border-amber-400 bg-amber-400/5 text-xs text-amber-400`}
+                    >
+                      {item.step}
+                    </div>
+                    <div className="h-px flex-1 bg-gray-800"></div>
+                  </div>
+                  <div className="mt-3.5 pr-3.5">
+                    <h4 className="mb-1 text-sm font-medium text-gray-100">
+                      {item.title}
+                    </h4>
+                    <p className={`${monoClass} text-xs text-gray-500`}>
+                      {item.command}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="grid gap-0 md:hidden">
+              {[
+                {
+                  step: "01",
+                  title: "Login with Google",
+                  command: "Click 'Get Started' → Google Login",
+                },
+                {
+                  step: "02",
+                  title: "Create project",
+                  command: "Projects → New Project",
+                },
+                {
+                  step: "03",
+                  title: "Add sections",
+                  command: "Project → Create Folders/Envs",
+                },
+                {
+                  step: "04",
+                  title: "Add variables",
+                  command: "Section → Add Environment Variables",
+                },
+              ].map((item, index) => (
+                <div key={index} className="grid grid-cols-[32px_1fr] gap-x-3">
+                  <div className="grid justify-items-center">
+                    <div
+                      className={`${monoClass} grid h-8 w-8 shrink-0 place-items-center rounded-full border border-amber-400 bg-amber-400/5 text-xs text-amber-400`}
+                    >
+                      {item.step}
+                    </div>
+                    <div className="mt-2 h-full w-px bg-gray-800"></div>
+                  </div>
+                  <div className="pb-5">
+                    <h4 className="text-sm font-medium text-gray-100">
+                      {item.title}
+                    </h4>
+                    <p className={`${monoClass} mt-1 text-xs text-gray-500`}>
+                      {item.command}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="overflow-x-hidden py-16">
+          <div className="h-px w-full bg-gray-800"></div>
+          <div
+            className={`${containerClass} grid grid-cols-1 items-start gap-8 pt-16 lg:grid-cols-2 lg:gap-16 max-[620px]:gap-5`}
+          >
+            <div>
+              <p
+                className={`${monoClass} mb-4 text-xs uppercase tracking-[0.15em] text-amber-400`}
+              >
+                Security
               </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-              {/* Feature 1 */}
-              <div className="relative bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
-                <div className="flex items-start gap-4 mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <FolderTree className="text-white text-xl" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900">Structured env storage</h3>
-                </div>
-                <p className="text-gray-600 leading-relaxed">
-                  Store your environment variables the same way your project is structured. Create a project, organize it into folders like frontend and backend, and store env files inside them. You can also nest folders as deep as your architecture requires.
-                </p>
-                <p className="text-gray-600 leading-relaxed mt-3">
-                  No more flat lists or messy files - everything stays organized and predictable.
-                </p>
-              </div>
-              
-              {/* Feature 2 */}
-              <div className="relative bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
-                <div className="flex items-start gap-4 mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Database className="text-white text-xl" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900">Persistent env backup</h3>
-                </div>
-                <p className="text-gray-600 leading-relaxed">
-                  Your environment variables stay safe even if your project doesn't. Delete a project from your local machine, switch devices, or clean up old repos - your env is still stored and accessible whenever you need it again.
-                </p>
-                <p className="text-gray-600 leading-relaxed mt-3">
-                  Re-clone your code, fetch your env from Envora, and continue working instantly.
-                </p>
-              </div>
-              
-              {/* Feature 3 */}
-              <div className="relative bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
-                <div className="flex items-start gap-4 mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Upload className="text-white text-xl" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900">Manual input and .env upload</h3>
-                </div>
-                <p className="text-gray-600 leading-relaxed">
-                  Add variables your way. You can manually create key-value pairs or upload a full .env file and let Envora automatically parse and store everything.
-                </p>
-                <p className="text-gray-600 leading-relaxed mt-3">
-                  Edit, update, or remove variables anytime without dealing with raw files.
-                </p>
-              </div>
-              
-              {/* Feature 4 */}
-              <div className="relative bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
-                <div className="flex items-start gap-4 mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Key className="text-white text-xl" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900">Credentials storage</h3>
-                </div>
-                <p className="text-gray-600 leading-relaxed">
-                  Store important account details alongside your projects. Save website logins, API keys, and credentials in a structured format with fields like title, website, email/username, password, and notes.
-                </p>
-                <p className="text-gray-600 leading-relaxed mt-3">
-                  Everything stays organized and easy to retrieve when needed.
-                </p>
-              </div>
-              
-              {/* Feature 5 */}
-              <div className="relative bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
-                <div className="flex items-start gap-4 mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-rose-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <StickyNote className="text-white text-xl" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900">Project notes</h3>
-                </div>
-                <p className="text-gray-600 leading-relaxed">
-                  Keep important information where it belongs - with your project. Add notes for setup steps, configurations, reminders, or anything you might forget later.
-                </p>
-                <p className="text-gray-600 leading-relaxed mt-3">
-                  No need to rely on random documents or scattered notes.
-                </p>
-              </div>
-              
-              {/* Feature 6 */}
-              <div className="relative bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
-                <div className="flex items-start gap-4 mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-orange-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Lock className="text-white text-xl" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900">Encrypted and private</h3>
-                </div>
-                <p className="text-gray-600 leading-relaxed">
-                  Your data is protected by design. All sensitive values are encrypted before being stored, and only you can access them through your authenticated session.
-                </p>
-                <p className="text-gray-600 leading-relaxed mt-3">
-                  Your env, credentials, and notes remain completely private and isolated to your account.
-                </p>
-              </div>
-            </div>
-            
-            <div className="text-center mt-16">
-              <p className="text-lg text-gray-700 font-medium">
-                No more lost env files. No more scattered data. Everything stays in one place.
+              <h2 className="mb-3.5 text-[clamp(30px,4vw,42px)] leading-[1.12] tracking-[-0.02em]">
+                Built for developers who care about their data
+              </h2>
+              <p className="max-w-[420px] text-sm text-gray-400">
+                Security isn't an add-on - it's built into how Envora works.
               </p>
+              <p className="mt-3 max-w-[420px] text-sm text-gray-400">
+                Sensitive values are encrypted before storage and are only
+                accessible through your authenticated session.
+              </p>
+
+              <div className="mt-6 grid gap-[14px]">
+                {security.map((item, index) => (
+                  <div key={index} className="flex items-start gap-2.5">
+                    <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-amber-400"></span>
+                    <div>
+                      <h4 className="mb-0.5 text-sm font-medium text-gray-200">
+                        {item.title}
+                      </h4>
+                      <p className="text-xs text-gray-500">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="relative max-w-full overflow-hidden rounded-[10px] border border-gray-800 bg-[#18181b] max-[620px]:overflow-x-auto">
+              <div className="flex items-center gap-2 border-b border-gray-800 px-4 py-3">
+                <span className="h-3 w-3 rounded-full bg-red-500 opacity-80"></span>
+                <span className="h-3 w-3 rounded-full bg-yellow-400 opacity-80"></span>
+                <span className="h-3 w-3 rounded-full bg-green-500 opacity-80"></span>
+                <span className={`${monoClass} ml-2 text-xs text-gray-500`}>
+                  encrypted vault
+                </span>
+              </div>
+
+              <div
+                className={`${monoClass} break-all p-5 text-xs leading-[1.65] text-gray-300 max-[900px]:p-4 max-[620px]:overflow-x-auto max-[620px]:p-2 max-[620px]:text-[10px] max-[480px]:p-1.5 max-[480px]:text-[9px]`}
+              >
+                <div className="mb-3 text-gray-600">
+                  # frontend / production vault view
+                </div>
+
+                <div>
+                  <span className="text-gray-400">DATABASE_URL</span>{" "}
+                  <span className="text-gray-600">=</span>
+                  <span className="text-amber-400">
+                    enc::v1::8f3a2b1c9d4e5f6a7b8c9d0e1f2a3b4c
+                  </span>
+                </div>
+                <div>
+                  <span className="text-gray-400">STRIPE_SECRET_KEY</span>{" "}
+                  <span className="text-gray-600">=</span>
+                  <span className="text-amber-400">
+                    enc::v1::1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d
+                  </span>
+                </div>
+                <div>
+                  <span className="text-gray-400">JWT_SECRET</span>{" "}
+                  <span className="text-gray-600">=</span>
+                  <span className="text-amber-400">
+                    enc::v1::9c8b7a6f5e4d3c2b1a0f9e8d7c6b5a4f
+                  </span>
+                </div>
+                <div>
+                  <span className="text-gray-400">OPENAI_API_KEY</span>{" "}
+                  <span className="text-gray-600">=</span>
+                  <span className="text-amber-400">
+                    enc::v1::2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a
+                  </span>
+                </div>
+                <div>
+                  <span className="text-gray-400">REDIS_URL</span>{" "}
+                  <span className="text-gray-600">=</span>
+                  <span className="text-amber-400">
+                    enc::v1::7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e
+                  </span>
+                </div>
+                <div>
+                  <span className="text-gray-400">NEXT_PUBLIC_URL</span>{" "}
+                  <span className="text-gray-600">=</span>
+                  <span className="text-zinc-50/60">https://myapp.com</span>
+                </div>
+
+                <div className="mt-3.5 border-t border-gray-800 pt-3.5">
+                  <div className="mt-2 flex items-center gap-2">
+                    <Check size={14} className="text-amber-300" />
+                    <span className="text-gray-600">
+                      5 encrypted values · 1 public · no plaintext stored
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Workflow Section */}
-        <section className="bg-gray-50 py-32">
-          <div className="w-full px-8">
-            <div className="text-center mb-20 space-y-4">
-              <h2 className="text-5xl font-bold tracking-tighter text-gray-900 mb-4">How it works</h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 max-w-7xl mx-auto">
-              <div className="relative">
-                <div className="text-5xl font-bold text-blue-600 mb-4">01</div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Create project</h3>
-                <p className="text-lg text-gray-600">Initialize your workspace with project-specific scope.</p>
-              </div>
-              <div className="relative">
-                <div className="text-5xl font-bold text-blue-600 mb-4">02</div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Structure zones</h3>
-                <p className="text-lg text-gray-600">Choose: add env or create folders for logic separation.</p>
-              </div>
-              <div className="relative">
-                <div className="text-5xl font-bold text-blue-600 mb-4">03</div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Store variables</h3>
-                <p className="text-lg text-gray-600">Fill in keys and secrets with instant encryption.</p>
-              </div>
-              <div className="relative">
-                <div className="text-5xl font-bold text-blue-600 mb-4">04</div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Access anytime</h3>
-                <p className="text-lg text-gray-600">Retrieve values via dashboard or upcoming CLI tool.</p>
-              </div>
-            </div>
-          </div>
-        </section>
+        <section className="overflow-x-hidden py-16 text-center">
+          <div className="h-px w-full bg-gray-800"></div>
+          <div className={`${containerClass} max-w-[760px] pt-16`}>
+            <p
+              className={`${monoClass} mb-4 text-xs uppercase tracking-[0.15em] text-amber-400`}
+            >
+              Get started
+            </p>
+            <h2 className="mb-3.5 text-[clamp(30px,4vw,42px)] leading-[1.12] tracking-[-0.02em]">
+              Stop losing env files.
+              <br />
+              Start shipping.
+            </h2>
+            <p className="mx-auto mb-7 max-w-[480px] text-sm text-gray-400">
+              Join thousands of developers who trust Envora with their
+              environment variables. Free to start, scales with your team.
+            </p>
 
-      
-        {/* Final CTA */}
-        <section className="py-40 text-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(197,199,200,0.03),transparent_60%)]"></div>
-          <div className="max-w-3xl mx-auto px-8 relative z-10 space-y-8">
-            <h2 className="text-5xl font-bold tracking-tighter text-gray-900">Stop losing track of your environment variables</h2>
-            <p className="text-gray-600 text-lg">Join developers who prioritize structure and security.</p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/register" className="w-full sm:w-auto bg-blue-600 text-white px-10 py-4 rounded-3xl font-bold hover:bg-blue-700 transition-colors">
-                Start Free
-              </Link>
-              <Link to="/login" className="w-full sm:w-auto border border-gray-300 px-10 py-4 rounded-3xl font-bold text-gray-700 hover:bg-gray-50 transition-colors">
-                Login
+            <div className="flex flex-wrap items-center justify-center gap-3 max-[620px]:w-full max-[620px]:flex-col">
+              <Link
+                to="/register"
+                className="inline-flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-amber-400 px-5 py-2.5 text-sm font-semibold text-[#0e0e10] transition-all duration-[180ms] hover:opacity-90 sm:w-auto"
+              >
+                Create free account <ChevronRight size={16} />
               </Link>
             </div>
           </div>
         </section>
       </main>
-
-      {/* Footer */}
-      <footer className="bg-[#0a0e18] border-t border-[#3b4766]/15 py-12 px-8">
-        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
-          <div className="col-span-2 md:col-span-1 space-y-4">
-            <div className="text-lg font-bold text-[#c5c7c8]">Envora</div>
-            <div className="text-[0.6875rem] uppercase tracking-[0.05em] font-['Inter'] text-[#8f9fb7]">
-              2024 Envora. All rights reserved.
-            </div>
-          </div>
-          <div className="space-y-4">
-            <div className="text-[0.6875rem] uppercase tracking-[0.05em] font-bold text-[#c5c7c8]">Resources</div>
-            <ul className="space-y-2">
-              <li><a className="text-[0.6875rem] uppercase tracking-[0.05em] text-[#8f9fb7] hover:text-[#c5c7c8] underline decoration-[#8f9fb7]/30 transition-opacity" href="#">Docs</a></li>
-              <li><a className="text-[0.6875rem] uppercase tracking-[0.05em] text-[#8f9fb7] hover:text-[#c5c7c8] underline decoration-[#8f9fb7]/30 transition-opacity" href="#">GitHub</a></li>
-            </ul>
-          </div>
-          <div className="space-y-4">
-            <div className="text-[0.6875rem] uppercase tracking-[0.05em] font-bold text-[#c5c7c8]">Social</div>
-            <ul className="space-y-2">
-              <li><a className="text-[0.6875rem] uppercase tracking-[0.05em] text-[#8f9fb7] hover:text-[#c5c7c8] underline decoration-[#8f9fb7]/30 transition-opacity" href="#">Twitter</a></li>
-              <li><a className="text-[0.6875rem] uppercase tracking-[0.05em] text-[#8f9fb7] hover:text-[#c5c7c8] underline decoration-[#8f9fb7]/30 transition-opacity" href="#">Legal</a></li>
-            </ul>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };

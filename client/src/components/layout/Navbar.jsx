@@ -7,36 +7,39 @@ const Navbar = () => {
 
   const getDisplayName = () => {
     if (!user) return "User";
-    
+
     // Try to get name from user object (could be from Google or registration)
     if (user.name) return user.name;
     if (user.email) {
       // Extract name from email (before @)
-      const emailName = user.email.split('@')[0];
+      const emailName = user.email.split("@")[0];
       return emailName.charAt(0).toUpperCase() + emailName.slice(1);
     }
-    
+
     return "User";
   };
 
   const getInitials = () => {
     const displayName = getDisplayName();
-    const names = displayName.split(' ');
+    const names = displayName.split(" ");
     if (names.length >= 2) {
-      return names[0].charAt(0).toUpperCase() + names[names.length - 1].charAt(0).toUpperCase();
+      return (
+        names[0].charAt(0).toUpperCase() +
+        names[names.length - 1].charAt(0).toUpperCase()
+      );
     }
     return displayName.charAt(0).toUpperCase();
   };
 
   return (
-    <header className="h-16 bg-panel border-b border-border flex items-center justify-between px-8 sticky top-0 z-40">
+    <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-gray-800 bg-[#181d28]/95 px-4 backdrop-blur-md sm:px-6 lg:px-8">
       {/* Search */}
-      <div className="flex items-center bg-code px-4 py-2 rounded-lg w-96 border border-border">
-        <Search size={16} className="text-textMuted mr-2" />
+      <div className="flex w-full max-w-md items-center rounded-lg border border-gray-700 bg-[#11161f] px-4 py-2.5">
+        <Search size={16} className="mr-2 text-gray-500" />
         <input
           type="text"
           placeholder="Search variables, folders..."
-          className="bg-transparent outline-none text-sm w-full text-textPrimary placeholder:text-textMuted"
+          className="w-full bg-transparent text-sm text-gray-100 outline-none placeholder:text-gray-500"
         />
       </div>
 
@@ -45,12 +48,18 @@ const Navbar = () => {
         {/* User */}
         <div className="flex items-center gap-3">
           <div className="text-right hidden sm:block">
-            <p className="text-sm font-semibold text-white">{getDisplayName()}</p>
-            <p className="text-xs text-primary uppercase">Developer</p>
+            <p className="text-sm font-semibold text-[#f4f4f5]">
+              {getDisplayName()}
+            </p>
+            <p className="text-xs uppercase tracking-[0.14em] text-amber-300/85">
+              Developer
+            </p>
           </div>
 
-          <div className="w-10 h-10 rounded-lg bg-[#0a0e18] border border-border flex items-center justify-center">
-            <span className="text-white font-bold">{getInitials()}</span>
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-700 bg-[#11161f]">
+            <span className="font-semibold text-[#f4f4f5]">
+              {getInitials()}
+            </span>
           </div>
         </div>
       </div>

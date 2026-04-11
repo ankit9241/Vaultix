@@ -25,15 +25,14 @@ const Sidebar = ({ onClose }) => {
   };
 
   return (
-    <aside className="w-64 h-dvh bg-panel border-r border-border flex flex-col p-4 overflow-y-auto overscroll-contain">
+    <aside className="flex h-screen w-64 flex-col border-r border-gray-800 bg-[#151a24] p-4">
       <div className="flex items-start justify-between gap-3 mb-8 px-2">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center shrink-0">
-            <Shield size={18} className="text-white" />
-          </div>
           <div className="min-w-0">
-            <h1 className="text-lg font-bold text-white truncate">Envora</h1>
-            <p className="text-[10px] text-textMuted uppercase tracking-widest truncate">
+            <h1 className="truncate text-lg font-semibold text-[#f4f4f5]">
+              Envora
+            </h1>
+            <p className="truncate text-[10px] uppercase tracking-[0.16em] text-amber-300/75">
               Developer Vault
             </p>
           </div>
@@ -43,7 +42,7 @@ const Sidebar = ({ onClose }) => {
           <button
             type="button"
             onClick={onClose}
-            className="lg:hidden h-9 w-9 rounded-lg border border-border bg-code flex items-center justify-center text-textSecondary hover:text-white hover:bg-[#1E293B] transition"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-700 bg-[#1b2130] text-gray-300 transition hover:border-amber-400/40 hover:text-white lg:hidden"
             aria-label="Close sidebar"
           >
             <X size={16} />
@@ -56,12 +55,12 @@ const Sidebar = ({ onClose }) => {
           <NavLink
             key={item.name}
             to={item.path}
-            onClick={onClose}
+            onClick={() => onClose?.()}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition ${
+              `flex items-center gap-3 rounded-lg px-4 py-3 text-sm transition ${
                 isActive
-                  ? "bg-[#1E293B] text-primary"
-                  : "text-textSecondary hover:bg-[#1E293B] hover:text-white"
+                  ? "bg-[#202839] text-amber-200"
+                  : "text-gray-300 hover:bg-[#1d2433] hover:text-white"
               }`
             }
           >
@@ -73,7 +72,7 @@ const Sidebar = ({ onClose }) => {
 
       <button
         onClick={handleLogout}
-        className="mt-4 flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-textSecondary hover:bg-[#1E293B] hover:text-white transition-colors"
+        className="mt-4 flex items-center gap-3 rounded-lg px-4 py-3 text-sm text-gray-300 transition-colors hover:bg-[#1d2433] hover:text-white"
         title="Logout"
       >
         <LogOut size={18} />

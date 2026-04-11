@@ -14,6 +14,7 @@ import Button from "../components/ui/Button";
 import Modal from "../components/ui/Modal";
 import EnvTable from "../components/EnvTable";
 import EnvModal from "../components/EnvModal";
+import Skeleton from "../components/ui/Skeleton";
 
 const ProjectDetails = () => {
   const { projectId } = useParams();
@@ -196,42 +197,63 @@ const ProjectDetails = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" onClick={() => navigate("/projects")}>
-            <ArrowLeft size={16} className="mr-2" />
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="px-2 sm:px-3"
+            onClick={() => navigate("/projects")}
+          >
+            <ArrowLeft size={14} className="mr-1.5" />
             Back
           </Button>
-          <div>
-            <h1 className="text-3xl font-semibold text-primary">
+          <div className="min-w-0">
+            <h1 className="text-3xl font-semibold text-amber-300">
               {project ? project.name : "Loading..."}
             </h1>
-            <p className="text-text-secondary mt-1">
+            <p className="mt-1 text-gray-300">
               {project
                 ? project.description || "No description provided."
                 : "Loading project details..."}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           {hasFolders ? (
-            <Button onClick={() => setIsModalOpen(true)}>
-              <Folder size={16} className="mr-2" />
+            <Button
+              size="sm"
+              className="text-xs sm:text-sm"
+              onClick={() => setIsModalOpen(true)}
+            >
+              <Folder size={14} className="mr-1.5" />
               Create Folder
             </Button>
           ) : hasEnv ? (
-            <Button onClick={() => setIsEnvModalOpen(true)}>
-              <Plus size={16} className="mr-2" />
+            <Button
+              size="sm"
+              className="text-xs sm:text-sm"
+              onClick={() => setIsEnvModalOpen(true)}
+            >
+              <Plus size={14} className="mr-1.5" />
               Add ENV
             </Button>
           ) : (
             <>
-              <Button onClick={() => setIsModalOpen(true)}>
-                <Folder size={16} className="mr-2" />
+              <Button
+                size="sm"
+                className="text-xs sm:text-sm"
+                onClick={() => setIsModalOpen(true)}
+              >
+                <Folder size={14} className="mr-1.5" />
                 Create Folder
               </Button>
-              <Button onClick={() => setIsEnvModalOpen(true)}>
-                <Plus size={16} className="mr-2" />
+              <Button
+                size="sm"
+                className="text-xs sm:text-sm"
+                onClick={() => setIsEnvModalOpen(true)}
+              >
+                <Plus size={14} className="mr-1.5" />
                 Add ENV
               </Button>
             </>
@@ -240,7 +262,7 @@ const ProjectDetails = () => {
       </div>
 
       {error && (
-        <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm">
+        <div className="rounded-lg border border-red-400/30 bg-red-500/10 p-3 text-sm text-red-300">
           {error}
         </div>
       )}
@@ -249,11 +271,11 @@ const ProjectDetails = () => {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
-            <Card key={i} className="animate-pulse">
+            <Card key={i}>
               <div className="space-y-3">
-                <div className="w-10 h-10 bg-slate-50 rounded-lg"></div>
-                <div className="h-4 bg-slate-50 rounded w-3/4"></div>
-                <div className="h-3 bg-slate-50 rounded w-1/2"></div>
+                <Skeleton className="h-10 w-10 rounded-lg" />
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-3 w-1/2" />
               </div>
             </Card>
           ))}
@@ -267,21 +289,21 @@ const ProjectDetails = () => {
               onClick={() =>
                 navigate(`/projects/${projectId}/sections/${section._id}`)
               }
-              className="cursor-pointer"
+              className="cursor-pointer border-gray-700 bg-[#151a24] hover:border-amber-400/50 hover:bg-[#1a2130]"
             >
               <div className="flex items-start justify-between mb-4">
-                <div className="w-10 h-10 bg-primary/10 text-primary rounded-lg flex items-center justify-center">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-400/10 text-amber-400">
                   <Folder size={20} />
                 </div>
-                <ChevronRight size={16} className="text-text-muted" />
+                <ChevronRight size={16} className="text-gray-500" />
               </div>
-              <h3 className="font-semibold text-primary mb-1">
+              <h3 className="mb-1 font-semibold text-[#f4f4f5]">
                 {section.name}
               </h3>
-              <p className="text-sm text-text-secondary mb-4">
+              <p className="mb-4 text-sm text-gray-300">
                 Environment variables for {section.name} environment
               </p>
-              <div className="flex items-center justify-between text-xs text-text-muted">
+              <div className="flex items-center justify-between text-xs text-gray-400">
                 <span>{section.folderCount ?? 0} folders</span>
                 <span>{section.envCount ?? section.varCount ?? 0} vars</span>
                 <Button
@@ -291,7 +313,7 @@ const ProjectDetails = () => {
                     e.stopPropagation();
                     handleDeleteSection(section._id);
                   }}
-                  className="text-red-600 hover:bg-red-500/10 px-2"
+                  className="px-2 text-red-400 hover:bg-red-400/10 hover:text-red-300"
                 >
                   Delete
                 </Button>
@@ -342,14 +364,14 @@ const ProjectDetails = () => {
           />
         </div>
       ) : (
-        <Card className="text-center py-12">
-          <div className="w-16 h-16 bg-card rounded-lg flex items-center justify-center text-text-muted mx-auto mb-4">
+        <Card className="py-12 text-center border-gray-700 bg-[#151a24]">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-lg bg-[#1d2433] text-gray-400">
             <Folder size={32} />
           </div>
-          <h3 className="text-lg font-semibold text-primary mb-2">
+          <h3 className="mb-2 text-lg font-semibold text-[#f4f4f5]">
             No items yet
           </h3>
-          <p className="text-text-secondary mb-4">
+          <p className="mb-4 text-gray-300">
             Create folders or add environment variables at project root
           </p>
           <div className="flex justify-center gap-3">
@@ -373,12 +395,12 @@ const ProjectDetails = () => {
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm">
+            <div className="rounded-lg border border-red-400/30 bg-red-500/10 p-3 text-sm text-red-300">
               {error}
             </div>
           )}
           <div>
-            <label className="block text-sm font-medium text-primary mb-2">
+            <label className="mb-2 block text-sm font-medium text-amber-300">
               Folder Name
             </label>
             <input
@@ -387,7 +409,7 @@ const ProjectDetails = () => {
               value={newSection.name}
               onChange={(e) => setNewSection({ name: e.target.value })}
               placeholder="e.g. Frontend, Backend, Staging"
-              className="w-full px-4 py-3 bg-code text-text-primary border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent placeholder:text-text-muted"
+              className="w-full rounded-lg border border-gray-700 bg-[#1d2433] px-4 py-3 text-[#f4f4f5] placeholder:text-gray-500 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400"
             />
           </div>
           <div className="flex gap-3 pt-2">

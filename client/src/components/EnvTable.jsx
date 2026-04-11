@@ -6,89 +6,100 @@ const EnvTable = ({ envs, onReveal, onCopy, onDelete, onEdit }) => {
   const getVisibleValue = (env) => env.actualValue ?? env.rawValue ?? env.value;
 
   return (
-    <div className="bg-transparent border border-border rounded-xl overflow-hidden">
+    <div className="overflow-hidden rounded-xl border border-[#3c3c3c] bg-[#1e1e1e] shadow-[0_12px_30px_rgba(0,0,0,0.25)]">
       <table className="w-full text-left">
         <thead>
-          <tr className="bg-transparent border-b border-border">
-            <th className="px-6 py-4 text-xs font-bold text-text-secondary uppercase tracking-widest">
+          <tr className="border-b border-[#3c3c3c] bg-[#2d2d30]">
+            <th className="w-[24%] px-4 py-3 font-mono text-[11px] font-semibold uppercase tracking-wider text-[#9da5b4]">
               Key
             </th>
-            <th className="px-6 py-4 text-xs font-bold text-text-secondary uppercase tracking-widest">
+            <th className="w-[36%] px-4 py-3 font-mono text-[11px] font-semibold uppercase tracking-wider text-[#9da5b4]">
               Value
             </th>
-            <th className="px-6 py-4 text-xs font-bold text-text-secondary uppercase tracking-widest">
+            <th className="px-4 py-3 font-mono text-[11px] font-semibold uppercase tracking-wider text-[#9da5b4]">
               Description
             </th>
-            <th className="px-6 py-4 text-xs font-bold text-text-secondary uppercase tracking-widest text-right">
+            <th className="w-[170px] px-4 py-3 text-right font-mono text-[11px] font-semibold uppercase tracking-wider text-[#9da5b4]">
               Actions
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-border">
+        <tbody className="divide-y divide-[#3c3c3c]">
           {envs.length === 0 ? (
             <tr>
-              <td colSpan="4" className="px-6 py-20 text-center">
-                <div className="flex flex-col items-center gap-3 text-text-muted">
+              <td colSpan="4" className="px-6 py-16 text-center">
+                <div className="flex flex-col items-center gap-3 text-[#6a6a6a]">
                   <ShieldQuestion size={48} strokeWidth={1.5} />
-                  <p className="font-medium text-text-secondary">
+                  <p className="font-mono text-sm text-[#9da5b4]">
                     No environment variables found in this section.
                   </p>
                 </div>
               </td>
             </tr>
           ) : (
-            envs.map((env) => (
+            envs.map((env, index) => (
               <tr
                 key={env._id}
-                className="hover:bg-[#1E293B] transition-colors group"
+                className="group transition-colors hover:bg-[#2a2d2e]"
               >
-                <td className="px-6 py-5">
-                  <span className="font-mono text-sm font-semibold text-primary bg-primary/10 px-2 py-1 rounded-lg">
-                    {env.key}
-                  </span>
+                <td className="px-4 py-3 align-top">
+                  <div className="flex items-center gap-3">
+                    <span className="w-6 text-right font-mono text-[11px] text-[#6a6a6a]">
+                      {index + 1}
+                    </span>
+                    <span className="font-mono text-sm font-semibold text-[#4FC1FF]">
+                      {env.key}
+                    </span>
+                  </div>
                 </td>
-                <td className="px-6 py-5">
-                  <div className="flex items-center gap-2 group/value">
-                    <span className="font-mono text-sm text-text-primary">
+
+                <td className="px-4 py-3 align-top">
+                  <div className="flex items-center gap-2">
+                    <span className="max-w-[320px] truncate font-mono text-sm text-[#CE9178]">
                       {env.revealed
                         ? getVisibleValue(env)
                         : getHiddenValue(env)}
                     </span>
                     <button
                       onClick={() => onReveal(env._id)}
-                      className="text-text-muted hover:text-primary transition-colors"
+                      className="rounded p-1 text-[#8a8a8a] transition-colors hover:bg-[#3c3c3c] hover:text-[#d4d4d4]"
+                      title={env.revealed ? "Hide value" : "Reveal value"}
                     >
                       {env.revealed ? <EyeOff size={14} /> : <Eye size={14} />}
                     </button>
                   </div>
                 </td>
-                <td className="px-6 py-5">
-                  <p className="text-sm text-text-secondary line-clamp-1 max-w-xs">
+
+                <td className="px-4 py-3 align-top">
+                  <p className="max-w-xs line-clamp-1 text-sm text-[#9da5b4]">
                     {env.description || "-"}
                   </p>
                 </td>
-                <td className="px-6 py-5 text-right">
-                  <div className="flex items-center justify-end gap-2">
-                    <button
-                      onClick={() => onEdit(env)}
-                      className="p-2 text-text-muted hover:text-primary hover:bg-primary/10 rounded-xl transition-all"
-                      title="Edit"
-                    >
-                      <Edit2 size={16} />
-                    </button>
+
+                <td className="px-4 py-3 text-right align-top">
+                  <div className="flex items-center justify-end gap-1">
+                    {onEdit && (
+                      <button
+                        onClick={() => onEdit(env)}
+                        className="rounded-md p-1.5 text-[#8a8a8a] transition-all hover:bg-[#3c3c3c] hover:text-[#dcdcaa]"
+                        title="Edit"
+                      >
+                        <Edit2 size={14} />
+                      </button>
+                    )}
                     <button
                       onClick={() => onCopy(getVisibleValue(env))}
-                      className="p-2 text-text-muted hover:text-primary hover:bg-primary/10 rounded-xl transition-all"
+                      className="rounded-md p-1.5 text-[#8a8a8a] transition-all hover:bg-[#3c3c3c] hover:text-[#dcdcaa]"
                       title="Copy"
                     >
-                      <Copy size={16} />
+                      <Copy size={14} />
                     </button>
                     <button
                       onClick={() => onDelete(env._id)}
-                      className="p-2 text-text-muted hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+                      className="rounded-md p-1.5 text-[#8a8a8a] transition-all hover:bg-[#5a1d1d] hover:text-[#f48771]"
                       title="Delete"
                     >
-                      <Trash2 size={16} />
+                      <Trash2 size={14} />
                     </button>
                   </div>
                 </td>

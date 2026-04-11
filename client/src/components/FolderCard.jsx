@@ -7,7 +7,7 @@ import ConfirmModal from "./ConfirmModal";
 const FolderCard = ({ folder, onNavigate, onEdit, onDelete }) => {
   const [confirmModal, setConfirmModal] = React.useState({
     isOpen: false,
-    itemName: ""
+    itemName: "",
   });
 
   const handleEdit = (e) => {
@@ -19,7 +19,7 @@ const FolderCard = ({ folder, onNavigate, onEdit, onDelete }) => {
     e.stopPropagation();
     setConfirmModal({
       isOpen: true,
-      itemName: folder.name
+      itemName: folder.name,
     });
   };
 
@@ -27,7 +27,7 @@ const FolderCard = ({ folder, onNavigate, onEdit, onDelete }) => {
     onDelete(folder._id);
     setConfirmModal({
       isOpen: false,
-      itemName: ""
+      itemName: "",
     });
   };
 
@@ -35,15 +35,15 @@ const FolderCard = ({ folder, onNavigate, onEdit, onDelete }) => {
     <>
       <Card
         hover
-        className="p-4 cursor-pointer"
+        className="cursor-pointer border-gray-700 bg-[#151a24] p-4 hover:border-amber-400/50 hover:bg-[#1a2130]"
         onClick={() => onNavigate(folder._id)}
       >
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3 flex-1">
-            <Folder className="text-primary" size={20} />
+            <Folder className="text-amber-400" size={20} />
             <div>
-              <h3 className="font-semibold text-white">{folder.name}</h3>
-              <p className="text-xs text-textMuted">
+              <h3 className="font-semibold text-[#f4f4f5]">{folder.name}</h3>
+              <p className="text-xs text-gray-400">
                 {folder.envCount || 0} env files
               </p>
             </div>
@@ -54,20 +54,24 @@ const FolderCard = ({ folder, onNavigate, onEdit, onDelete }) => {
               size="sm"
               onClick={handleEdit}
               title="Edit folder"
-              className="text-textMuted hover:text-white"
+              className="text-gray-400 hover:bg-amber-400/10 hover:text-amber-300"
             >
-              <Edit2 size={14} className="text-textMuted" />
+              <Edit2 size={14} className="text-gray-400" />
             </Button>
             <Button
               variant="ghost"
               size="sm"
               onClick={handleDelete}
               title="Delete folder"
-              className="text-red-500 hover:text-red-600 hover:bg-red-50"
+              className="text-red-400 hover:bg-red-400/10 hover:text-red-300"
             >
               <Trash2 size={14} />
             </Button>
-            <Button variant="ghost" size="sm">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-gray-400 hover:bg-amber-400/10 hover:text-amber-300"
+            >
               <ArrowRight size={14} />
             </Button>
           </div>
@@ -77,11 +81,13 @@ const FolderCard = ({ folder, onNavigate, onEdit, onDelete }) => {
       {/* Confirmation Modal */}
       <ConfirmModal
         isOpen={confirmModal.isOpen}
-        onClose={() => setConfirmModal({
-          ...confirmModal,
-          isOpen: false,
-          itemName: ""
-        })}
+        onClose={() =>
+          setConfirmModal({
+            ...confirmModal,
+            isOpen: false,
+            itemName: "",
+          })
+        }
         onConfirm={confirmDelete}
         title="Delete Folder"
         message={`Are you sure you want to delete "${confirmModal.itemName}"? This action cannot be undone.`}
